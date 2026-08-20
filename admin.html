@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DuAri Hausmeister - Admin Panel</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col">
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed top-4 right-4 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-2 transition-all duration-300 transform translate-x-full opacity-0">
+    <span id="toast-msg" class="text-xs font-semibold">Erfolgreich gespeichert!</span>
+  </div>
+
+  <!-- Login Form Wrapper -->
+  <div id="login-container" class="flex flex-col items-center justify-center min-h-screen px-4">
+    <div class="bg-white rounded-3xl p-8 shadow-xl max-w-md w-full border border-slate-200/50">
+      <div class="flex flex-col items-center mb-8">
+        <div class="w-16 h-16 bg-blue-600 text-white rounded-2xl flex items-center justify-center font-black text-2xl shadow-lg shadow-blue-500/20 mb-4">DA</div>
+        <h2 class="text-xl font-bold text-slate-900 text-center">DuAri Hausmeister</h2>
+        <p class="text-xs text-slate-400 mt-1">Admin Dashboard Login</p>
+      </div>
+      
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Passwort</label>
+          <input id="admin-pass" type="password" placeholder="Passwort eingeben" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-600 font-semibold transition-all">
+        </div>
+        <div id="login-error" class="text-red-500 text-xs font-semibold hidden">Falsches Passwort! Bitte versuchen Sie es erneut.</div>
+        <button onclick="handleLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold transition-all shadow-md mt-2 focus:outline-none">
+          Einloggen
+        </button>
+      </div>
+      <div class="mt-6 text-center text-[10px] text-slate-400">
+        Standard-Passwort: <span class="font-bold">admin123</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard Container (Hidden by default) -->
+  <div id="dashboard-container" class="hidden flex-1 flex flex-col md:flex-row">
+    <!-- Sidebar -->
+    <aside class="w-full md:w-64 bg-slate-900 text-slate-400 flex flex-col border-r border-slate-800 shrink-0">
+      <div class="p-6 flex items-center space-x-3 border-b border-slate-800">
+        <div class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center font-black text-lg">DA</div>
+        <div>
+          <span class="text-sm font-bold text-white block">DuAri Service</span>
+          <span class="text-[10px] text-slate-500 block" id="db-status-badge">LocalStorage Mode</span>
+        </div>
+      </div>
+      <nav class="flex-grow p-4 space-y-1 text-xs font-bold select-none overflow-y-auto">
+        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all text-white bg-blue-600">
+          <span>📊 Dashboard</span>
+        </button>
+        <button onclick="switchTab('inquiries')" id="nav-inquiries" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all hover:text-white hover:bg-slate-800">
+          <span>📬 Angebote & Anfragen</span>
+        </button>
+        <button onclick="switchTab('messages')" id="nav-messages" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all hover:text-white hover:bg-slate-800">
+          <span>✉️ Kontakt-Nachrichten</span>
+        </button>
+        <button onclick="switchTab('services')" id="nav-services" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all hover:text-white hover:bg-slate-800">
+          <span>🌟 Dienstleistungen</span>
+        </button>
+        <button onclick="switchTab('gallery')" id="nav-gallery" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all hover:text-white hover:bg-slate-800">
+          <span>🖼️ Galerie (Vorher/Nachher)</span>
+        </button>
+        <button onclick="switchTab('vorteile')" id="nav-vorteile" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all hover:text-white hover:bg-slate-800">
+          <span>🎨 Vorteile & About</span>
+        </button>
+        <button onclick="switchTab('reviews')" id="nav-reviews" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all hover:text-white hover:bg-slate-800">
+          <span>⭐ Bewertungen & Sterne</span>
+        </button>
+        <button onclick="switchTab('settings')" id="nav-settings" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all hover:text-white hover:bg-slate-800">
+          <span>⚙️ Website-Einstellungen</span>
+        </button>
+      </nav>
+      <div class="p-4 border-t border-slate-800 text-xs">
+        <button onclick="handleLogout()" class="w-full bg-slate-800 hover:bg-red-950 hover:text-red-300 text-slate-400 py-2.5 rounded-xl font-bold transition-all">
+          Abmelden
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-y-auto p-6 md:p-8">
+      
+      <!-- 1. DASHBOARD TAB -->
+      <section id="tab-dashboard" class="tab-panel space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-extrabold text-slate-900">Willkommen im Admin Panel</h1>
+            <p class="text-sm text-slate-500 mt-1">Hier ist die schnelle Übersicht über Ihr Geschäft.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="bg-white rounded-3xl p-6 border border-slate-200/60 shadow-sm flex items-center space-x-4">
+            <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-xl">📬</div>
+            <div>
+              <span class="text-slate-400 font-bold text-[10px] uppercase tracking-wider block">Unbearbeitete Anfragen</span>
+              <span class="text-3xl font-extrabold text-slate-900 block mt-1" id="stat-pending-inquiries">0</span>
+            </div>
+          </div>
+          <div class="bg-white rounded-3xl p-6 border border-slate-200/60 shadow-sm flex items-center space-x-4">
+            <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center text-xl">✉️</div>
+            <div>
+              <span class="text-slate-400 font-bold text-[10px] uppercase tracking-wider block">Ungelesene Nachrichten</span>
+              <span class="text-3xl font-extrabold text-slate-900 block mt-1" id="stat-unread-messages">0</span>
+            </div>
+          </div>
+          <div class="bg-white rounded-3xl p-6 border border-slate-200/60 shadow-sm flex items-center space-x-4">
+            <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-xl">⭐</div>
+            <div>
+              <span class="text-slate-400 font-bold text-[10px] uppercase tracking-wider block">Ausstehende Bewertungen</span>
+              <span class="text-3xl font-extrabold text-slate-900 block mt-1" id="stat-pending-reviews">0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- System Information -->
+        <div class="bg-white rounded-3xl p-6 md:p-8 border border-slate-200/60 shadow-sm space-y-4">
+          <h2 class="text-lg font-bold text-slate-900">Supabase & Brevo Integration</h2>
+          <p class="text-xs text-slate-500 leading-relaxed">
+            Dieses Admin Panel ist so konzipiert, dass es nahtlos mit Ihrer Datenbank und der E-Mail-Schnittstelle kommuniziert. Wenn Supabase nicht konfiguriert ist, werden alle Daten automatisch in Ihrem Browser (LocalStorage) gespeichert.
+          </p>
+          <div class="bg-slate-50 border border-slate-200/50 rounded-2xl p-4 text-[11px] font-mono leading-relaxed space-y-1">
+            <div><span class="font-bold text-slate-400">Brevo Status:</span> <span id="brevo-status-text" class="text-amber-600 font-bold">Kein API-Key hinterlegt (Demo-Modus)</span></div>
+            <div><span class="font-bold text-slate-400">Supabase:</span> <span id="supabase-status-text" class="text-slate-600">Checking...</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. ANGEBOTE & ANFRAGEN TAB -->
+      <section id="tab-inquiries" class="tab-panel hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 class="text-2xl font-extrabold text-slate-900">Angebote & Anfragen</h1>
+            <p class="text-sm text-slate-500 mt-1">Hier finden Sie alle Preiskalkulationen von potenziellen Kunden.</p>
+          </div>
+          <!-- Status Filter -->
+          <div class="flex bg-white rounded-xl border border-slate-200/60 p-0.5 shadow-sm text-[10px] font-bold select-none overflow-x-auto shrink-0 max-w-full">
+            <button onclick="filterInq('all')" id="f-inq-all" class="px-3 py-1.5 rounded-lg bg-blue-600 text-white">Alle</button>
+            <button onclick="filterInq('Neu')" id="f-inq-Neu" class="px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-900">Neu</button>
+            <button onclick="filterInq('Kontaktiert')" id="f-inq-Kontaktiert" class="px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-900">Kontaktierte</button>
+            <button onclick="filterInq('Angebot erstellt')" id="f-inq-Angebot-erstellt" class="px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-900">Angebot gesendet</button>
+            <button onclick="filterInq('Angenommen')" id="f-inq-Angenommen" class="px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-900">Angenommen</button>
+            <button onclick="filterInq('Abgelehnt')" id="f-inq-Abgelehnt" class="px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-900">Abgelehnt</button>
+          </div>
+        </div>
+
+        <div id="inquiries-list" class="space-y-4">
+          <!-- Dynamically Rendered -->
+        </div>
+      </section>
+
+      <!-- 3. KONTAKT-NACHRICHTEN TAB -->
+      <section id="tab-messages" class="tab-panel hidden space-y-6">
+        <div>
+          <h1 class="text-2xl font-extrabold text-slate-900">Kontakt-Nachrichten</h1>
+          <p class="text-sm text-slate-500 mt-1">Nachrichten aus dem allgemeinen Kontaktformular.</p>
+        </div>
+        <div id="messages-list" class="space-y-4">
+          <!-- Dynamically Rendered -->
+        </div>
+      </section>
+
+      <!-- 4. DIENSTLEISTUNGEN TAB -->
+      <section id="tab-services" class="tab-panel hidden space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-extrabold text-slate-900">Dienstleistungen verwalten</h1>
+            <p class="text-sm text-slate-500 mt-1">Bearbeiten Sie die 6 Hauptleistungen, die auf der Startseite angezeigt werden.</p>
+          </div>
+          <button onclick="openServiceModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 px-4 rounded-xl transition-all shadow-md">
+            + Neue Leistung
+          </button>
+        </div>
+        <div id="services-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Dynamically Rendered -->
+        </div>
+      </section>
+
+      <!-- 5. GALERIE TAB -->
+      <section id="tab-gallery" class="tab-panel hidden space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-extrabold text-slate-900">Galerie (Vorher/Nachher)</h1>
+            <p class="text-sm text-slate-500 mt-1">Fügen Sie Vorher-/Nachher-Bilder von durchgeführten Projekten hinzu.</p>
+          </div>
+          <button onclick="openProjectModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 px-4 rounded-xl transition-all shadow-md">
+            + Neues Projekt
+          </button>
+        </div>
+        <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Dynamically Rendered -->
+        </div>
+      </section>
+
+      <!-- 6. VORTEILE & ABOUT TAB -->
+      <section id="tab-vorteile" class="tab-panel hidden space-y-6">
+        <div>
+          <h1 class="text-2xl font-extrabold text-slate-900">Vorteile & About</h1>
+          <p class="text-sm text-slate-500 mt-1">Hier können Sie die 4 Gründe ("Warum wir") und Rreth Nesh-Details anpassen.</p>
+        </div>
+        <div id="vorteile-cards-container" class="space-y-6">
+          <!-- Dynamically Rendered -->
+        </div>
+        <div class="flex justify-end mt-4">
+          <button onclick="saveAllVorteile()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-3 px-6 rounded-xl transition-all shadow-md">
+            Alle Vorteile speichern
+          </button>
+        </div>
+      </section>
+
+      <!-- 7. BEWERTUNGEN & STERNE TAB -->
+      <section id="tab-reviews" class="tab-panel hidden space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-extrabold text-slate-900">Bewertungen moderieren</h1>
+            <p class="text-sm text-slate-500 mt-1">Kundenbewertungen freigeben, sperren oder löschen.</p>
+          </div>
+          <div class="flex bg-white rounded-xl border border-slate-200/60 p-0.5 shadow-sm text-xs font-bold select-none shrink-0">
+            <button id="filter-all" onclick="filterReviews('all')" class="px-3 py-1.5 rounded-lg bg-blue-600 text-white">Alle</button>
+            <button id="filter-pending" onclick="filterReviews('pending')" class="px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-900">Ausstehend</button>
+            <button id="filter-approved" onclick="filterReviews('approved')" class="px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-900">Freigegeben</button>
+          </div>
+        </div>
+        <div id="admin-reviews-list" class="space-y-4">
+          <!-- Dynamically Rendered -->
+        </div>
+      </section>
+
+      <!-- 8. WEBSITE EINSTELLUNGEN TAB -->
+      <section id="tab-settings" class="tab-panel hidden space-y-6">
+        <div>
+          <h1 class="text-2xl font-extrabold text-slate-900">Website Einstellungen</h1>
+          <p class="text-sm text-slate-500 mt-1">Ändern Sie Kontaktangaben, Passwörter und E-Mail-Schlüssel.</p>
+        </div>
+        <div class="bg-white rounded-3xl p-6 md:p-8 border border-slate-200/60 shadow-md space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Telefonnummer</label>
+              <input id="set-phone" type="text" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold focus:outline-none focus:border-blue-600 transition-all">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">E-Mail-Adresse</label>
+              <input id="set-email" type="email" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold focus:outline-none focus:border-blue-600 transition-all">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Adresse</label>
+              <input id="set-address" type="text" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold focus:outline-none focus:border-blue-600 transition-all">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Arbeitszeiten</label>
+              <input id="set-hours" type="text" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold focus:outline-none focus:border-blue-600 transition-all">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">WhatsApp Nummer (Nur Zahlen, z.B. 491729137112)</label>
+              <input id="set-whatsapp" type="text" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold focus:outline-none focus:border-blue-600 transition-all">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Brevo API-Schlüssel (api-key)</label>
+              <input id="set-brevo" type="password" placeholder="xkeysib-..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold focus:outline-none focus:border-blue-600 transition-all">
+            </div>
+          </div>
+          <div class="border-t border-slate-100 pt-6">
+            <h3 class="text-sm font-bold text-slate-900 mb-4">Admin-Passwort ändern</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Neues Passwort</label>
+                <input id="set-password" type="password" placeholder="Neues Passwort (min. 6 Zeichen)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold focus:outline-none focus:border-blue-600 transition-all">
+              </div>
+            </div>
+          </div>
+          <div class="flex justify-end pt-4">
+            <button onclick="saveAllSettings()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-3 px-6 rounded-xl transition-all shadow-md">
+              Einstellungen speichern
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODALS -->
+
+  <!-- 1. Brevo Offer Send Modal -->
+  <div id="modal-email" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 md:p-8 shadow-2xl border border-slate-100 flex flex-col space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+          <span>📧</span>
+          <span>Angebot per Brevo senden</span>
+        </h3>
+        <button onclick="closeEmailModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold focus:outline-none">&times;</button>
+      </div>
+      <div class="space-y-4 text-xs font-semibold">
+        <input id="mail-inq-id" type="hidden">
+        <div>
+          <label class="block text-slate-500 uppercase tracking-wider mb-1.5">Empfänger E-Mail</label>
+          <input id="mail-to" type="text" disabled class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-slate-500 uppercase tracking-wider mb-1.5">E-Mail Betreff (Subject)</label>
+          <input id="mail-subject" type="text" placeholder="Ihre Offerte von DuAri Hausmeister" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:border-blue-600 transition-all">
+        </div>
+        <div>
+          <label class="block text-slate-500 uppercase tracking-wider mb-1.5">Nachricht (E-Mail Text)</label>
+          <textarea id="mail-body" rows="10" placeholder="Konditionen, Preisdetails..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:border-blue-600 transition-all font-mono resize-none"></textarea>
+        </div>
+      </div>
+      <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+        <span class="text-[10px] text-slate-400 font-bold" id="email-sender-info">Sender: DuAri Hausmeister &lt;duariservice@gmail.com&gt;</span>
+        <div class="flex items-center space-x-2">
+          <button onclick="closeEmailModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold text-xs transition-all">Abbrechen</button>
+          <button onclick="sendEmailSubmit()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs transition-all flex items-center space-x-1.5">
+            <span id="send-mail-btn-text">Angebot senden</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Add/Edit Service Modal -->
+  <div id="modal-service" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 md:p-8 shadow-2xl border border-slate-100 flex flex-col space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 id="service-modal-title" class="text-lg font-bold text-slate-900">Leistung bearbeiten</h3>
+        <button onclick="closeServiceModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold focus:outline-none">&times;</button>
+      </div>
+      <div class="space-y-4 text-xs font-semibold overflow-y-auto max-h-[450px] pr-2">
+        <input id="srv-id" type="hidden">
+        <div>
+          <label class="block text-slate-500 uppercase tracking-wider mb-1.5">Titel der Dienstleistung</label>
+          <input id="srv-title" type="text" placeholder="z.B. Büroreinigung" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:border-blue-600">
+        </div>
+        <div>
+          <label class="block text-slate-500 uppercase tracking-wider mb-1.5">Preis ab (ab €)</label>
+          <input id="srv-price" type="text" placeholder="z.B. ab 30" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:border-blue-600">
+        </div>
+        <div>
+          <label class="block text-slate-500 uppercase tracking-wider mb-1.5">Foto (URL oder Dateiname, z.B. brandschutz.jpg)</label>
+          <input id="srv-photo" type="text" placeholder="brandschutz.jpg" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:border-blue-600">
+        </div>
+        <div>
+          <label class="block text-slate-500 uppercase tracking-wider mb-1.5">Checklist (Eine Zeile pro Punkt)</label>
+          <textarea id="srv-checklist" rows="4" placeholder="Punkt 1&#10;Punkt 2" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:border-blue-600 resize-none"></textarea>
+        </div>
+        <div>
+          <label class="block text-slate-500 uppercase tracking-wider mb-1.5">Vorteile / Benefits (Eine Zeile pro Punkt)</label>
+          <textarea id="srv-benefits" rows="4" placeholder="Vorteil 1&#10;Vorteil 2" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:border-blue-600 resize-none"></textarea>
+        </div>
+      </div>
+      <div class="flex justify-end space-x-2 pt-4 border-t border-slate-100">
+        <button onclick="closeServiceModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold text-xs transition-all">Abbrechen</button>
+        <button onclick="saveServiceSubmit()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs transition-all">Speichern</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Add/Edit Project Modal -->
+  <div id="modal-project" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 md:p-8 shadow-2xl border border-slate-100 flex flex-col space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 id="project-modal-title" class="text-lg font-bold text-slate-900">Projekt bearbeiten</h3>
+        <button onclick="closeProjectModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold focus:outline-none">&times;</button>
+      </div>
+      <div class="space-y-4 text-xs font-semibold overflow-y-auto max-h-[450px] pr-2">
+        <input id="proj-id" type="hidden">
+        <div>
+          <label class="block text-slate-500 uppercase tracking-wider mb-1.5">Projekttitel</label>
+          <input id="proj-title" type="text" placeholder="z.B. Büroreinigung Hauptbahnhof" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:border-blue-600">
+        </div>
+        <div>
+          <label class="block text-slate-500 uppercase tracking-wider mb-1.5">Kategorie / Genre (z.B. Büroreinigung, Glasreinigung)</label>
+          <input id="proj-category" type="text" placeholder="z.B. Büroreinigung" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:border-blue-600">
+        </div>
+        <div>
+          <label class="block text-slate-500 uppercase tracking-wider mb-1.5">Statistik (z.B. 100% pastërti)</label>
+          <input id="proj-stats" type="text" placeholder="100% pastërti" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:border-blue-600">
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-slate-500 uppercase tracking-wider mb-1.5">Foto Vorher (URL/Filename)</label>
+            <input id="proj-before" type="text" placeholder="kaelteschutz.jpg" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:border-blue-600">
+          </div>
+          <div>
+            <label class="block text-slate-500 uppercase tracking-wider mb-1.5">Foto Nachher (URL/Filename)</label>
+            <input id="proj-after" type="text" placeholder="schallschutz.jpg" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:border-blue-600">
+          </div>
+        </div>
+      </div>
+      <div class="flex justify-end space-x-2 pt-4 border-t border-slate-100">
+        <button onclick="closeProjectModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold text-xs transition-all">Abbrechen</button>
+        <button onclick="saveProjectSubmit()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs transition-all">Speichern</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Services and Dashboard Logic -->
+  <script src="supabase-config.js"></script>
+  <script>
+    let activeTab = 'dashboard';
+    let allReviews = [];
+    let allInquiries = [];
+    let allMessages = [];
+    let allServices = [];
+    let allProjects = [];
+    let allVorteile = [];
+    let websiteSettings = {};
+    let activeFilter = 'all';
+    let inquiryFilter = 'all';
+
+    // Verification on DOM load
+    document.addEventListener("DOMContentLoaded", async () => {
+      // Fetch settings first to verify password if needed
+      await loadSettings();
+      const isAuth = sessionStorage.getItem("admin_auth");
+      if (isAuth === "true") {
+        showDashboard();
+      } else {
+        document.getElementById("login-container").classList.remove("hidden");
+      }
+    });
+
+    const loadSettings = async () => {
+      try {
+        websiteSettings = await SettingsService.fetchSettings();
+      } catch (e) {
+        console.error("Failed to load settings:", e);
+      }
+    };
+
+    const handleLogin = () => {
+      const passInput = document.getElementById("admin-pass").value;
+      const errorDiv = document.getElementById("login-error");
+      
+      const actualPass = websiteSettings.admin_password || "admin123";
+      
+      if (passInput === actualPass) {
+        sessionStorage.setItem("admin_auth", "true");
+        errorDiv.classList.add("hidden");
+        showDashboard();
+      } else {
+        errorDiv.classList.remove("hidden");
+      }
+    };
+
+    const handleLogout = () => {
+      sessionStorage.removeItem("admin_auth");
+      location.reload();
+    };
+
+    const showToast = (message) => {
+      const toast = document.getElementById("toast");
+      const msg = document.getElementById("toast-msg");
+      msg.innerText = message;
+      toast.classList.remove("translate-x-full", "opacity-0");
+      setTimeout(() => {
+        toast.classList.add("translate-x-full", "opacity-0");
+      }, 3000);
+    };
+
+    const showDashboard = async () => {
+      document.getElementById("login-container").classList.add("hidden");
+      document.getElementById("dashboard-container").classList.remove("hidden");
+      
+      // Update DB connection badge
+      const badge = document.getElementById("db-status-badge");
+      const supText = document.getElementById("supabase-status-text");
+      if (typeof supabaseClient !== 'undefined' && supabaseClient !== null) {
+        badge.innerText = "Supabase Connected";
+        badge.className = "text-[9px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full uppercase tracking-wider";
+        supText.innerText = "Supabase API Connected. Live tables in row-level-security mode.";
+        supText.className = "text-emerald-600 font-semibold";
+      } else {
+        badge.innerText = "LocalStorage Mode";
+        badge.className = "text-[9px] font-bold text-amber-600 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full uppercase tracking-wider";
+        supText.innerText = "Local fallback mode (Browser storage). Supabase config url and anonymous key not loaded.";
+        supText.className = "text-amber-600 font-semibold";
+      }
+
+      const brevoText = document.getElementById("brevo-status-text");
+      if (websiteSettings.brevo_api_key) {
+        brevoText.innerText = "Brevo API-Schlüssel aktiv. E-Mails werden über das Brevo-SMTP-Konto gesendet.";
+        brevoText.className = "text-emerald-600 font-bold";
+      } else {
+        brevoText.innerText = "Kein API-Key hinterlegt (E-Mail wird für Demo-Zwecke geloggt, nicht wirklich gesendet).";
+        brevoText.className = "text-amber-600 font-bold";
+      }
+
+      await refreshData();
+      renderAll();
+    };
+
+    const refreshData = async () => {
+      try {
+        allInquiries = await InquiryService.fetchInquiries();
+        allMessages = await ContactService.fetchMessages();
+        allServices = await ServiceManager.fetchServices();
+        allProjects = await ProjectService.fetchProjects();
+        allVorteile = await VorteileService.fetchVorteile();
+        allReviews = await ReviewService.fetchAllReviews();
+        
+        // Render statistics
+        document.getElementById("stat-pending-inquiries").innerText = allInquiries.filter(i => i.status === 'Neu').length;
+        document.getElementById("stat-unread-messages").innerText = allMessages.filter(m => !m.read).length;
+        document.getElementById("stat-pending-reviews").innerText = allReviews.filter(r => !r.approved).length;
+      } catch (err) {
+        console.error("Failed to load data sets:", err);
+      }
+    };
+
+    const switchTab = (tabName) => {
+      activeTab = tabName;
+      document.querySelectorAll(".tab-panel").forEach(p => p.classList.add("hidden"));
+      document.getElementById(`tab-${tabName}`).classList.remove("hidden");
+      
+      // Update active nav styles
+      document.querySelectorAll("aside nav button").forEach(btn => {
+        btn.className = "w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all hover:text-white hover:bg-slate-800";
+      });
+      document.getElementById(`nav-${tabName}`).className = "w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all text-white bg-blue-600";
+      
+      renderAll();
+    };
+
+    const renderAll = () => {
+      if (activeTab === 'inquiries') renderInquiries();
+      if (activeTab === 'messages') renderMessages();
+      if (activeTab === 'services') renderServices();
+      if (activeTab === 'gallery') renderProjects();
+      if (activeTab === 'vorteile') renderVorteile();
+      if (activeTab === 'reviews') renderReviews();
+      if (activeTab === 'settings') populateSettingsForm();
+    };
+
+    // --- TAB: INQUIRIES & OFFERS ---
+    const filterInq = (status) => {
+      inquiryFilter = status;
+      document.querySelectorAll("[id^='f-inq-']").forEach(b => {
+        b.className = "px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-900";
+      });
+      const actId = status === 'all' ? 'f-inq-all' : `f-inq-${status.replace(" ", "-")}`;
+      const activeBtn = document.getElementById(actId);
+      if (activeBtn) activeBtn.className = "px-3 py-1.5 rounded-lg bg-blue-600 text-white";
+      renderInquiries();
+    };
+
+    const renderInquiries = () => {
+      const container = document.getElementById("inquiries-list");
+      container.innerHTML = "";
+      
+      let filtered = allInquiries;
+      if (inquiryFilter !== 'all') {
+        filtered = allInquiries.filter(i => i.status === inquiryFilter);
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="bg-white rounded-3xl p-12 border border-slate-200/60 text-center text-slate-400">
+            <p class="font-bold text-slate-600">Keine Anfragen gefunden</p>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(inq => {
+        const dateStr = inq.created_at ? new Date(inq.created_at).toLocaleString("de-DE") : "-";
+        
+        let photosHtml = "";
+        if (inq.photos && inq.photos.length > 0) {
+          photosHtml = `
+            <div class="mt-3">
+              <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Hochgeladene Fotos</span>
+              <div class="flex flex-wrap gap-2">
+                ${inq.photos.map(p => `
+                  <a href="${p}" target="_blank">
+                    <img src="${p}" class="w-16 h-16 object-cover rounded-lg border border-slate-200 hover:scale-105 transition-all">
+                  </a>
+                `).join("")}
+              </div>
+            </div>
+          `;
+        }
+
+        const card = document.createElement("div");
+        card.className = "bg-white border border-slate-200/60 rounded-3xl p-6 shadow-sm space-y-4";
+        card.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
+            <div class="flex items-center space-x-3">
+              <span class="text-xs font-bold bg-blue-50 text-blue-600 border border-blue-200/40 px-2.5 py-1 rounded-full">${inq.service || "Reinigung"}</span>
+              <span class="text-xs text-slate-400 font-semibold">${dateStr}</span>
+              <select onchange="updateInqStatus('${inq.id}', this.value)" class="text-xs font-bold rounded-full px-2 py-0.5 border outline-none ${
+                inq.status === 'Neu' ? 'bg-amber-50 text-amber-600 border-amber-200' :
+                inq.status === 'Kontaktiert' ? 'bg-blue-50 text-blue-600 border-blue-200' :
+                inq.status === 'Angebot erstellt' ? 'bg-indigo-50 text-indigo-600 border-indigo-200' :
+                inq.status === 'Angenommen' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
+                'bg-red-50 text-red-600 border-red-200'
+              }">
+                <option value="Neu" ${inq.status === 'Neu' ? 'selected' : ''}>Neu</option>
+                <option value="Kontaktiert" ${inq.status === 'Kontaktiert' ? 'selected' : ''}>Kontaktiert</option>
+                <option value="Angebot erstellt" ${inq.status === 'Angebot erstellt' ? 'selected' : ''}>Angebot gesendet</option>
+                <option value="Angenommen" ${inq.status === 'Angenommen' ? 'selected' : ''}>Angenommen</option>
+                <option value="Abgelehnt" ${inq.status === 'Abgelehnt' ? 'selected' : ''}>Abgelehnt</option>
+              </select>
+            </div>
+            <div class="flex items-center space-x-2">
+              <button onclick="openEmailModal('${inq.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-3.5 rounded-xl transition-all shadow-sm">
+                Angebot per Brevo senden
+              </button>
+              <button onclick="deleteInquiry('${inq.id}')" class="bg-red-50 text-red-600 hover:bg-red-100 text-xs font-bold py-2 px-3 rounded-xl transition-all border border-red-100">
+                Löschen
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+            <div>
+              <span class="text-slate-400 font-bold block">Kundendetails:</span>
+              <div class="mt-1 space-y-1 font-semibold">
+                <div><span class="text-slate-500">Name:</span> ${inq.name}</div>
+                <div><span class="text-slate-500">Telefon:</span> <a href="tel:${inq.phone}" class="text-blue-600 hover:underline">${inq.phone}</a></div>
+                <div><span class="text-slate-500">E-Mail:</span> <a href="mailto:${inq.email}" class="text-blue-600 hover:underline">${inq.email}</a></div>
+                <div><span class="text-slate-500">Adresse:</span> ${inq.address}</div>
+              </div>
+            </div>
+            <div>
+              <span class="text-slate-400 font-bold block">Anfragedetails:</span>
+              <div class="mt-1 space-y-1 font-semibold">
+                <div><span class="text-slate-500">Fläche:</span> ${inq.size || 0} m²</div>
+                <div><span class="text-slate-500">Zimmer / Bäder / Fenster:</span> ${inq.rooms || 0} Zimmer, ${inq.bathrooms || 0} Bäder, ${inq.windows || 0} Fenster</div>
+                <div><span class="text-slate-500">Wunschtermin:</span> ${inq.date || "Flexibel"}</div>
+                <div><span class="text-slate-500">Ergänzende Nachricht:</span> <span class="italic font-normal">"${inq.message || '-'}"</span></div>
+              </div>
+            </div>
+          </div>
+          ${photosHtml}
+        `;
+        container.appendChild(card);
+      });
+    };
+
+    const updateInqStatus = async (id, status) => {
+      const ok = await InquiryService.updateStatus(id, status);
+      if (ok) {
+        allInquiries = allInquiries.map(i => i.id === id ? { ...i, status } : i);
+        showToast("Status aktualisiert!");
+        renderInquiries();
+      }
+    };
+
+    const deleteInquiry = async (id) => {
+      if (confirm("Anfrage wirklich löschen?")) {
+        const ok = await InquiryService.deleteInquiry(id);
+        if (ok) {
+          allInquiries = allInquiries.filter(i => i.id !== id);
+          showToast("Anfrage gelöscht.");
+          renderInquiries();
+        }
+      }
+    };
+
+    // --- TAB: CONTACT MESSAGES ---
+    const renderMessages = () => {
+      const container = document.getElementById("messages-list");
+      container.innerHTML = "";
+
+      if (allMessages.length === 0) {
+        container.innerHTML = `
+          <div class="bg-white rounded-3xl p-12 border border-slate-200/60 text-center text-slate-400">
+            <p class="font-bold text-slate-600">Keine Nachrichten vorhanden</p>
+          </div>
+        `;
+        return;
+      }
+
+      allMessages.forEach(msg => {
+        const dateStr = msg.created_at ? new Date(msg.created_at).toLocaleString("de-DE") : "-";
+        const card = document.createElement("div");
+        card.className = `bg-white border ${msg.read ? 'border-slate-200/60' : 'border-blue-300 ring-1 ring-blue-100'} rounded-3xl p-6 shadow-sm space-y-4`;
+        card.innerHTML = `
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center space-x-2">
+              <span class="text-xs text-slate-400 font-bold">${dateStr}</span>
+              ${!msg.read ? '<span class="bg-blue-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">Ungelesen</span>' : ''}
+            </div>
+            <div class="flex items-center space-x-2">
+              <button onclick="toggleMessageRead('${msg.id}', ${!msg.read})" class="text-xs font-bold text-blue-600 hover:underline">
+                ${msg.read ? 'Als ungelesen markieren' : 'Als gelesen markieren'}
+              </button>
+              <button onclick="deleteMessage('${msg.id}')" class="bg-red-50 text-red-600 hover:bg-red-100 text-xs font-bold py-1.5 px-3 rounded-xl transition-all border border-red-100">
+                Löschen
+              </button>
+            </div>
+          </div>
+          <div class="text-xs space-y-2 font-semibold">
+            <div><span class="text-slate-400 font-bold block">Absender:</span> ${msg.name} (${msg.email}) ${msg.phone ? '| Tel: ' + msg.phone : ''}</div>
+            <div>
+              <span class="text-slate-400 font-bold block">Nachricht:</span>
+              <p class="mt-1 text-sm italic font-normal text-slate-800 leading-relaxed bg-slate-50 border border-slate-200/50 rounded-2xl p-4">"${msg.message}"</p>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    };
+
+    const toggleMessageRead = async (id, read) => {
+      const ok = await ContactService.markAsRead(id, read);
+      if (ok) {
+        allMessages = allMessages.map(m => m.id === id ? { ...m, read } : m);
+        showToast(read ? "Nachricht gelesen." : "Nachricht ungelesen.");
+        renderMessages();
+      }
+    };
+
+    const deleteMessage = async (id) => {
+      if (confirm("Nachricht endgültig löschen?")) {
+        const ok = await ContactService.deleteMessage(id);
+        if (ok) {
+          allMessages = allMessages.filter(m => m.id !== id);
+          showToast("Nachricht gelöscht.");
+          renderMessages();
+        }
+      }
+    };
+
+    // --- TAB: SERVICES ---
+    const renderServices = () => {
+      const grid = document.getElementById("services-grid");
+      grid.innerHTML = "";
+
+      allServices.forEach(srv => {
+        const card = document.createElement("div");
+        card.className = "bg-white border border-slate-200/60 rounded-3xl p-6 shadow-sm flex flex-col justify-between";
+        card.innerHTML = `
+          <div class="space-y-4">
+            <div class="flex items-start justify-between">
+              <h3 class="text-base font-extrabold text-slate-900">${srv.title}</h3>
+              <span class="text-xs font-bold bg-blue-50 text-blue-600 border border-blue-200/40 px-2 py-0.5 rounded-full">ab €${srv.price}</span>
+            </div>
+            ${srv.photo ? `<img src="${srv.photo}" class="w-full h-32 object-cover rounded-2xl border border-slate-200">` : ''}
+            
+            <div class="grid grid-cols-2 gap-4 text-xs font-semibold">
+              <div>
+                <span class="text-slate-400 block uppercase tracking-wider text-[9px] font-bold">Checklist</span>
+                <ul class="list-disc pl-4 space-y-0.5 mt-1">
+                  ${srv.checklist.map(i => `<li>${i}</li>`).join("")}
+                </ul>
+              </div>
+              <div>
+                <span class="text-slate-400 block uppercase tracking-wider text-[9px] font-bold">Vorteile</span>
+                <ul class="list-disc pl-4 space-y-0.5 mt-1 text-emerald-600">
+                  ${srv.benefits.map(i => `<li>${i}</li>`).join("")}
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center space-x-2 border-t border-slate-100 pt-4 mt-6">
+            <button onclick="openServiceModal('${srv.id}')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold py-2.5 rounded-xl transition-all">
+              Bearbeiten
+            </button>
+            <button onclick="deleteService('${srv.id}')" class="bg-red-50 text-red-600 hover:bg-red-100 text-xs font-bold py-2.5 px-4 rounded-xl transition-all border border-red-100">
+              Löschen
+            </button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    };
+
+    const openServiceModal = (id = '') => {
+      const modal = document.getElementById("modal-service");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+      
+      const titleEl = document.getElementById("service-modal-title");
+      
+      if (id) {
+        titleEl.innerText = "Leistung bearbeiten";
+        const s = allServices.find(x => x.id === id);
+        document.getElementById("srv-id").value = s.id;
+        document.getElementById("srv-title").value = s.title;
+        document.getElementById("srv-price").value = s.price;
+        document.getElementById("srv-photo").value = s.photo || '';
+        document.getElementById("srv-checklist").value = (s.checklist || []).join("\n");
+        document.getElementById("srv-benefits").value = (s.benefits || []).join("\n");
+      } else {
+        titleEl.innerText = "Neue Leistung hinzufügen";
+        document.getElementById("srv-id").value = "";
+        document.getElementById("srv-title").value = "";
+        document.getElementById("srv-price").value = "";
+        document.getElementById("srv-photo").value = "";
+        document.getElementById("srv-checklist").value = "";
+        document.getElementById("srv-benefits").value = "";
+      }
+    };
+
+    const closeServiceModal = () => {
+      const modal = document.getElementById("modal-service");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    };
+
+    const saveServiceSubmit = async () => {
+      const id = document.getElementById("srv-id").value;
+      const title = document.getElementById("srv-title").value;
+      const price = document.getElementById("srv-price").value;
+      const photo = document.getElementById("srv-photo").value;
+      const checklist = document.getElementById("srv-checklist").value.split("\n").filter(x => x.trim());
+      const benefits = document.getElementById("srv-benefits").value.split("\n").filter(x => x.trim());
+
+      const data = { title, price, photo, checklist, benefits };
+      if (id) data.id = id;
+
+      const ok = await ServiceManager.saveService(data);
+      if (ok) {
+        closeServiceModal();
+        showToast("Leistung erfolgreich gespeichert!");
+        await refreshData();
+        renderServices();
+      }
+    };
+
+    const deleteService = async (id) => {
+      if (confirm("Möchten Sie diese Leistung wirklich löschen?")) {
+        const ok = await ServiceManager.deleteService(id);
+        if (ok) {
+          showToast("Leistung gelöscht.");
+          await refreshData();
+          renderServices();
+        }
+      }
+    };
+
+    // --- TAB: GALLERY ---
+    const renderProjects = () => {
+      const grid = document.getElementById("projects-grid");
+      grid.innerHTML = "";
+
+      allProjects.forEach(proj => {
+        const card = document.createElement("div");
+        card.className = "bg-white border border-slate-200/60 rounded-3xl p-6 shadow-sm flex flex-col justify-between";
+        card.innerHTML = `
+          <div class="space-y-4">
+            <div class="flex items-start justify-between">
+              <div>
+                <h3 class="text-sm font-extrabold text-slate-900">${proj.title}</h3>
+                <span class="text-[10px] text-slate-400 font-bold block">${proj.category}</span>
+              </div>
+              <span class="bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-100">${proj.stats}</span>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2">
+              <div class="relative rounded-xl overflow-hidden aspect-video bg-slate-100 border border-slate-200">
+                <img src="${proj.before_photo}" class="w-full h-full object-cover">
+                <span class="absolute bottom-1.5 left-1.5 bg-black/60 text-[8px] font-bold text-white px-1.5 py-0.5 rounded uppercase">Vorher</span>
+              </div>
+              <div class="relative rounded-xl overflow-hidden aspect-video bg-slate-100 border border-slate-200">
+                <img src="${proj.after_photo}" class="w-full h-full object-cover">
+                <span class="absolute bottom-1.5 left-1.5 bg-blue-600 text-[8px] font-bold text-white px-1.5 py-0.5 rounded uppercase">Nachher</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center space-x-2 border-t border-slate-100 pt-4 mt-6">
+            <button onclick="openProjectModal('${proj.id}')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold py-2.5 rounded-xl transition-all">
+              Bearbeiten
+            </button>
+            <button onclick="deleteProject('${proj.id}')" class="bg-red-50 text-red-600 hover:bg-red-100 text-xs font-bold py-2.5 px-4 rounded-xl transition-all border border-red-100">
+              Löschen
+            </button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    };
+
+    const openProjectModal = (id = '') => {
+      const modal = document.getElementById("modal-project");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+      
+      const titleEl = document.getElementById("project-modal-title");
+      
+      if (id) {
+        titleEl.innerText = "Projekt bearbeiten";
+        const p = allProjects.find(x => x.id === id);
+        document.getElementById("proj-id").value = p.id;
+        document.getElementById("proj-title").value = p.title;
+        document.getElementById("proj-category").value = p.category;
+        document.getElementById("proj-stats").value = p.stats;
+        document.getElementById("proj-before").value = p.before_photo || '';
+        document.getElementById("proj-after").value = p.after_photo || '';
+      } else {
+        titleEl.innerText = "Neues Projekt hinzufügen";
+        document.getElementById("proj-id").value = "";
+        document.getElementById("proj-title").value = "";
+        document.getElementById("proj-category").value = "";
+        document.getElementById("proj-stats").value = "";
+        document.getElementById("proj-before").value = "";
+        document.getElementById("proj-after").value = "";
+      }
+    };
+
+    const closeProjectModal = () => {
+      const modal = document.getElementById("modal-project");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    };
+
+    const saveProjectSubmit = async () => {
+      const id = document.getElementById("proj-id").value;
+      const title = document.getElementById("proj-title").value;
+      const category = document.getElementById("proj-category").value;
+      const stats = document.getElementById("proj-stats").value;
+      const before_photo = document.getElementById("proj-before").value;
+      const after_photo = document.getElementById("proj-after").value;
+
+      const data = { title, category, stats, before_photo, after_photo };
+      if (id) data.id = id;
+
+      const ok = await ProjectService.saveProject(data);
+      if (ok) {
+        closeProjectModal();
+        showToast("Projekt erfolgreich gespeichert!");
+        await refreshData();
+        renderProjects();
+      }
+    };
+
+    const deleteProject = async (id) => {
+      if (confirm("Möchten Sie dieses Projekt wirklich löschen?")) {
+        const ok = await ProjectService.deleteProject(id);
+        if (ok) {
+          showToast("Projekt gelöscht.");
+          await refreshData();
+          renderProjects();
+        }
+      }
+    };
+
+    // --- TAB: VORTEILE & ABOUT ---
+    const renderVorteile = () => {
+      const container = document.getElementById("vorteile-cards-container");
+      container.innerHTML = "";
+
+      allVorteile.forEach((vor, index) => {
+        const item = document.createElement("div");
+        item.className = "bg-white border border-slate-200/60 rounded-3xl p-6 shadow-sm space-y-4";
+        item.innerHTML = `
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <span class="text-xs font-bold text-slate-400">Vorteils-Karte #${index + 1}</span>
+            <div class="flex items-center space-x-2">
+              <input type="text" id="vor-ki-prompt-${index}" placeholder="z.B. clean kitchen luxury marble" class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1 text-[11px] font-semibold focus:outline-none w-48">
+              <button onclick="generateAIImage(${index})" id="vor-ki-btn-${index}" class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold py-1 px-3 rounded-lg transition-all">
+                KI-Bild generieren (FLUX)
+              </button>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start text-xs font-semibold">
+            <div class="md:col-span-2 space-y-4">
+              <div>
+                <label class="block text-slate-500 uppercase tracking-wider mb-1.5">Titel der Karte</label>
+                <input type="text" id="vor-title-${index}" value="${vor.title}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-slate-500 uppercase tracking-wider mb-1.5">Beschreibung</label>
+                <textarea id="vor-desc-${index}" rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none resize-none">${vor.description}</textarea>
+              </div>
+            </div>
+            <div>
+              <label class="block text-slate-500 uppercase tracking-wider mb-1.5">Foto (URL/Dateiname)</label>
+              <input type="text" id="vor-photo-${index}" value="${vor.photo}" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none text-[10px] font-mono mb-2" oninput="document.getElementById('vor-img-preview-${index}').src = this.value">
+              <img id="vor-img-preview-${index}" src="${vor.photo}" class="w-full h-24 object-cover rounded-xl border border-slate-200 mt-2 bg-slate-50">
+            </div>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    };
+
+    const generateAIImage = async (index) => {
+      const promptInput = document.getElementById(`vor-ki-prompt-${index}`);
+      const prompt = promptInput.value.trim();
+      const btn = document.getElementById(`vor-ki-btn-${index}`);
+      
+      if (!prompt) {
+        alert("Bitte geben Sie eine Beschreibung ein, um das KI-Bild zu generieren!");
+        return;
+      }
+      
+      const originalText = btn.innerText;
+      btn.innerText = "Wird generiert...";
+      btn.disabled = true;
+      
+      try {
+        const randomSeed = Math.floor(Math.random() * 1000000);
+        // Use pollination flux image generator
+        const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=800&height=600&model=flux&nologo=true&seed=${randomSeed}`;
+        
+        // Let's pre-load image to verify it's generated
+        const img = new Image();
+        img.src = imageUrl;
+        img.onload = () => {
+          document.getElementById(`vor-photo-${index}`).value = imageUrl;
+          document.getElementById(`vor-img-preview-${index}`).src = imageUrl;
+          btn.innerText = originalText;
+          btn.disabled = false;
+          showToast("KI-Bild erfolgreich generiert!");
+        };
+      } catch (err) {
+        console.error("AI Generation failed:", err);
+        btn.innerText = originalText;
+        btn.disabled = false;
+        alert("Konnte kein Bild generieren, bitte versuchen Sie es erneut.");
+      }
+    };
+
+    const saveAllVorteile = async () => {
+      const items = allVorteile.map((vor, index) => ({
+        id: vor.id,
+        title: document.getElementById(`vor-title-${index}`).value,
+        description: document.getElementById(`vor-desc-${index}`).value,
+        photo: document.getElementById(`vor-photo-${index}`).value,
+        sort_order: index + 1
+      }));
+
+      const ok = await VorteileService.saveVorteile(items);
+      if (ok) {
+        showToast("Alle Vorteile erfolgreich gespeichert!");
+        await refreshData();
+        renderVorteile();
+      }
+    };
+
+    // --- TAB: REVIEWS ---
+    const filterReviews = (filter) => {
+      activeFilter = filter;
+      document.querySelectorAll("[id^='filter-']").forEach(btn => {
+        btn.className = "px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-900";
+      });
+      const activeBtn = document.getElementById(`filter-${filter}`);
+      if (activeBtn) activeBtn.className = "px-3 py-1.5 rounded-lg bg-blue-600 text-white";
+      renderReviews();
+    };
+
+    const renderReviews = () => {
+      const listContainer = document.getElementById("admin-reviews-list");
+      listContainer.innerHTML = "";
+
+      let filtered = allReviews;
+      if (activeFilter === 'pending') {
+        filtered = allReviews.filter(r => !r.approved);
+      } else if (activeFilter === 'approved') {
+        filtered = allReviews.filter(r => r.approved);
+      }
+
+      if (filtered.length === 0) {
+        listContainer.innerHTML = `
+          <div class="bg-white rounded-3xl p-12 border border-slate-200/60 text-center text-slate-400">
+            <p class="font-bold text-slate-600">Keine Bewertungen gefunden</p>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(review => {
+        const dateStr = review.created_at ? new Date(review.created_at).toLocaleDateString("de-DE") : "-";
+        
+        let starsHtml = "";
+        const ratingVal = Math.round(review.rating || 5);
+        for (let i = 1; i <= 5; i++) {
+          starsHtml += `
+            <svg class="w-4 h-4 ${i <= ratingVal ? 'text-amber-400' : 'text-slate-200'}" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+            </svg>
+          `;
+        }
+
+        const card = document.createElement("div");
+        card.className = "bg-white border border-slate-200/60 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6";
+        card.innerHTML = `
+          <div class="flex-1 space-y-3">
+            <div class="flex items-center space-x-3">
+              <span class="text-xs font-bold bg-blue-50 text-blue-600 border border-blue-200/40 px-2.5 py-1 rounded-full">${review.service || "Allgemein"}</span>
+              <span class="text-xs text-slate-400 font-semibold">${dateStr}</span>
+              <span class="text-xs font-bold px-2 py-0.5 rounded-full ${review.approved ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-amber-50 text-amber-600 border border-amber-100'}">
+                ${review.approved ? 'Freigegeben' : 'Ausstehend'}
+              </span>
+            </div>
+            
+            <div class="flex items-center space-x-1.5">
+              <div class="flex">${starsHtml}</div>
+              <span class="text-xs font-bold text-slate-500">(${review.rating || '5.0'})</span>
+            </div>
+
+            <p class="text-sm italic text-slate-700 leading-relaxed font-medium">"${review.text}"</p>
+
+            <div class="flex items-center space-x-2">
+              <div class="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs">
+                ${review.name.charAt(0).toUpperCase()}
+              </div>
+              <div class="text-xs">
+                <span class="font-bold text-slate-900 block">${review.name}</span>
+                <span class="text-slate-400 block">${review.email || 'Keine E-Mail angegeben'}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex md:flex-col items-center gap-2 w-full md:w-auto border-t md:border-t-0 border-slate-100 pt-4 md:pt-0 shrink-0">
+            ${!review.approved ? `
+              <button onclick="approveReview('${review.id}')" class="flex-1 md:w-32 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 px-4 rounded-xl transition-all shadow-sm">
+                Genehmigen
+              </button>
+            ` : `
+              <button onclick="rejectReview('${review.id}')" class="flex-1 md:w-32 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold py-2.5 px-4 rounded-xl transition-all shadow-sm">
+                Sperren
+              </button>
+            `}
+            <button onclick="deleteReview('${review.id}')" class="flex-1 md:w-32 bg-red-50 text-red-600 hover:bg-red-100 text-xs font-bold py-2.5 px-4 rounded-xl transition-all border border-red-200/30">
+              Löschen
+            </button>
+          </div>
+        `;
+        listContainer.appendChild(card);
+      });
+    };
+
+    const approveReview = async (id) => {
+      const success = await ReviewService.approveReview(id);
+      if (success) {
+        allReviews = allReviews.map(r => r.id === id ? { ...r, approved: true } : r);
+        showToast("Vlerësimi u miratua!");
+        renderReviews();
+      }
+    };
+
+    const rejectReview = async (id) => {
+      const success = await ReviewService.rejectReview(id);
+      if (success) {
+        allReviews = allReviews.map(r => r.id === id ? { ...r, approved: false } : r);
+        showToast("Vlerësimi u bllokua.");
+        renderReviews();
+      }
+    };
+
+    const deleteReview = async (id) => {
+      if (confirm("Möchten Sie diese Bewertung wirklich endgültig löschen?")) {
+        const success = await ReviewService.deleteReview(id);
+        if (success) {
+          allReviews = allReviews.filter(r => r.id !== id);
+          showToast("Bewertung gelöscht.");
+          renderReviews();
+        }
+      }
+    };
+
+    // --- TAB: SETTINGS ---
+    const populateSettingsForm = () => {
+      document.getElementById("set-phone").value = websiteSettings.phone || '';
+      document.getElementById("set-email").value = websiteSettings.email || '';
+      document.getElementById("set-address").value = websiteSettings.address || '';
+      document.getElementById("set-hours").value = websiteSettings.working_hours || '';
+      document.getElementById("set-whatsapp").value = websiteSettings.whatsapp || '';
+      document.getElementById("set-brevo").value = websiteSettings.brevo_api_key || '';
+      document.getElementById("set-password").value = '';
+    };
+
+    const saveAllSettings = async () => {
+      const phone = document.getElementById("set-phone").value;
+      const email = document.getElementById("set-email").value;
+      const address = document.getElementById("set-address").value;
+      const working_hours = document.getElementById("set-hours").value;
+      const whatsapp = document.getElementById("set-whatsapp").value;
+      const brevo_api_key = document.getElementById("set-brevo").value;
+      const newPassword = document.getElementById("set-password").value;
+
+      const data = { phone, email, address, working_hours, whatsapp, brevo_api_key };
+      if (newPassword && newPassword.trim().length >= 6) {
+        data.admin_password = newPassword.trim();
+      }
+
+      const updated = await SettingsService.saveSettings(data);
+      if (updated) {
+        websiteSettings = updated;
+        showToast("Einstellungen erfolgreich gespeichert!");
+        // Update statuses on dashboard
+        const brevoText = document.getElementById("brevo-status-text");
+        if (websiteSettings.brevo_api_key) {
+          brevoText.innerText = "Brevo API-Schlüssel aktiv. E-Mails werden über das Brevo-SMTP-Konto gesendet.";
+          brevoText.className = "text-emerald-600 font-bold";
+        } else {
+          brevoText.innerText = "Kein API-Key hinterlegt (E-Mail wird für Demo-Zwecke geloggt, nicht wirklich gesendet).";
+          brevoText.className = "text-amber-600 font-bold";
+        }
+      }
+    };
+
+    // --- MODAL: BREVO OFFER SEND ---
+    const openEmailModal = (inqId) => {
+      const inq = allInquiries.find(x => x.id === inqId);
+      if (!inq) return;
+
+      document.getElementById("mail-inq-id").value = inq.id;
+      document.getElementById("mail-to").value = `${inq.name} <${inq.email}>`;
+      document.getElementById("mail-subject").value = `Ihr individuelles Angebot - DuAri Hausmeister`;
+      
+      // Auto-drafting offer text
+      const bodyText = `Sehr geehrte/r ${inq.name},\n\nvielen Dank für Ihre Anfrage!\n\nGerne bieten wir Ihnen für die gewünschte Dienstleistung "${inq.service}" ein individuelles und faires Festpreisangebot an:\n\n---\nLEISTUNG: ${inq.service}\nFLÄCHE: ${inq.size} m²\nUMFANG: ${inq.rooms || 0} Zimmer, ${inq.bathrooms || 0} Bäder/Tualete, ${inq.windows || 0} Fenster\nADRESSE / ORT: ${inq.address}\nWUNSCHTERMIN: ${inq.date || "Nach Vereinbarung"}\n\nKONDITIONEN & ANGEBOTSPREIS:\nUnser kalkulierter Pauschalpreis beträgt: € ______________ (inkl. MwSt. & Anfahrt)\n\nInkludierte Arbeiten:\n${inq.message ? 'Spezifischer Wunsch: "' + inq.message + '"\n' : ''}- Gründliche Reinigung gemäß unserer Standard-Checkliste\n- Alle Reinigungsmittel & Profi-Ausrüstung inklusive\n- 100% Zufriedenheitsgarantie\n---\n\nBitte antworten Sie direkt auf diese E-Mail, um das Angebot zu bestätigen oder einen festen Termin zu vereinbaren.\n\nMit freundlichen Grüßen,\nDuAri Hausmeister\nTel: ${websiteSettings.phone || '+49 (0) 172 913 7112'}\nWhatsApp: https://wa.me/${websiteSettings.whatsapp || '491729137112'}`;
+      
+      document.getElementById("mail-body").value = bodyText;
+
+      const modal = document.getElementById("modal-email");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    };
+
+    const closeEmailModal = () => {
+      const modal = document.getElementById("modal-email");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    };
+
+    const sendEmailSubmit = async () => {
+      const id = document.getElementById("mail-inq-id").value;
+      const subject = document.getElementById("mail-subject").value;
+      const text = document.getElementById("mail-body").value;
+
+      const inq = allInquiries.find(x => x.id === id);
+      if (!inq) return;
+
+      const btn = document.getElementById("send-mail-btn-text");
+      const originalText = btn.innerText;
+      btn.innerText = "Wird gesendet...";
+
+      try {
+        const res = await InquiryService.sendBrevoOffer(inq, subject, text, websiteSettings.brevo_api_key);
+        btn.innerText = originalText;
+        closeEmailModal();
+        
+        // Update inquiry status to offer sent
+        await InquiryService.updateStatus(id, "Angebot erstellt");
+        allInquiries = allInquiries.map(i => i.id === id ? { ...i, status: "Angebot erstellt" } : i);
+        
+        if (res && res.mock) {
+          alert("E-Mail-Vorschau erzeugt! (Demo-Modus aktiv - Details im Konsolen-Log).");
+          console.log("Mock Email Sent:\nSubject:", subject, "\nBody:\n", text);
+        } else {
+          showToast("Angebot erfolgreich gesendet!");
+        }
+        
+        renderInquiries();
+      } catch (err) {
+        btn.innerText = originalText;
+        console.error(err);
+        alert("E-Mail-Dërgimi dështoi: " + err.message);
+      }
+    };
+  </script>
+</body>
+</html>
