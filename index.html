@@ -28,6 +28,23 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
+    #video-modal-custom, #service-detail-modal {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background-color: rgba(2, 6, 23, 0.9) !important;
+      z-index: 9999999 !important;
+      display: none;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 16px !important;
+      box-sizing: border-box !important;
+    }
+    #video-modal-custom.active, #service-detail-modal.active {
+      display: flex !important;
+    }
     section {
       scroll-margin-top: calc(var(--header-height, 80px) + 24px);
     }
@@ -1328,7 +1345,7 @@
       <!-- Title & Sub-checks Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-12">
         <div class="lg:col-span-7">
-          <h2 data-i18n="contactTitle" class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 leading-tight">
+          <h2 data-i18n="contactTitle" class="text-3xl sm:text-4xl md:text-5xl font-normal tracking-tight text-slate-900 leading-tight">
             Fordern Sie jetzt Ihr<br><span class="text-blue-600">Festpreis-Angebot an.</span>
           </h2>
           <!-- Sub checks list -->
@@ -1695,54 +1712,49 @@
       </button>
     </div>
   <!-- Service Details Modal (Popup) -->
-  <div id="service-detail-modal" class="fixed inset-0 z-[300] bg-slate-950/75 backdrop-blur-md items-center justify-center p-4" style="display: none;" onclick="if(event.target === this) closeServiceDetailModal()">
-    <div id="service-detail-modal-card" class="bg-white rounded-3xl max-w-2xl w-full p-6 md:p-8 relative shadow-2xl border border-slate-100 text-left max-h-[90vh] overflow-y-auto">
+  <div id="service-detail-modal" onclick="if(event.target === this) closeServiceDetailModal()">
+    <div id="service-detail-modal-card" style="position: relative; width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto; background: #ffffff; border-radius: 24px; padding: 24px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); text-align: left; color: #1e293b;">
       
       <!-- Close Button -->
-      <button onclick="closeServiceDetailModal()" class="absolute top-5 right-5 w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 hover:text-slate-900 transition-all cursor-pointer" aria-label="Schließen">
-        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
+      <button onclick="closeServiceDetailModal()" style="position: absolute; top: 16px; right: 16px; width: 36px; height: 36px; border-radius: 50%; background: #f1f5f9; color: #334155; border: none; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center;" aria-label="Schließen">&times;</button>
 
       <!-- Modal Header (Icon + Category Badge) -->
-      <div class="flex items-center space-x-4 mb-6 pr-8">
-        <div id="service-modal-icon-container" class="w-14 h-14 rounded-2xl bg-blue-50 border border-dashed border-blue-200 flex items-center justify-center text-blue-600 shrink-0 shadow-sm">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-right: 40px;">
+        <div id="service-modal-icon-container" style="width: 52px; height: 52px; border-radius: 16px; background: #eff6ff; border: 1px dashed #bfdbfe; display: flex; align-items: center; justify-content: center; color: #2563eb; flex-shrink: 0;">
         </div>
         <div>
-          <span id="service-modal-badge" class="inline-flex items-center text-[11px] font-bold text-blue-600 uppercase tracking-widest bg-blue-50 border border-blue-200/60 px-2.5 py-1 rounded-full mb-1">LEISTUNGS-DETAILS</span>
-          <h3 id="service-modal-title" class="text-2xl md:text-3xl font-extrabold text-slate-900 leading-tight">Wärmeschutz</h3>
+          <span id="service-modal-badge" style="display: inline-block; font-size: 11px; font-weight: 700; color: #2563eb; text-transform: uppercase; letter-spacing: 1px; background: #eff6ff; border: 1px solid #bfdbfe; padding: 3px 10px; border-radius: 999px; margin-bottom: 4px;">LEISTUNGS-DETAILS</span>
+          <h3 id="service-modal-title" style="font-size: 24px; font-weight: 800; color: #0f172a; margin: 0;">Wärmeschutz</h3>
         </div>
       </div>
 
       <!-- Image preview inside modal -->
-      <div class="relative w-full h-48 md:h-56 rounded-2xl overflow-hidden mb-6 shadow-inner border border-slate-100">
-        <img id="service-modal-img" src="feature_ergebnisse.jpg" class="w-full h-full object-cover" alt="Service Detail">
-        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-transparent to-transparent"></div>
-        <div class="absolute bottom-3 left-4 text-white text-xs font-semibold tracking-wide" id="service-modal-img-caption">Prekadini ThermoTech Isoliersysteme</div>
+      <div style="width: 100%; height: 200px; border-radius: 16px; overflow: hidden; margin-bottom: 20px; position: relative;">
+        <img id="service-modal-img" src="feature_ergebnisse.jpg" style="width: 100%; height: 100%; object-fit: cover;" alt="Service Detail">
+        <div style="position: absolute; bottom: 12px; left: 12px; color: #fff; font-size: 12px; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,0.8);" id="service-modal-img-caption">Prekadini ThermoTech Isoliersysteme</div>
       </div>
 
       <!-- Detailed Description -->
-      <div class="space-y-3 text-slate-600 text-sm md:text-base leading-relaxed">
-        <p id="service-modal-desc-main" class="font-semibold text-slate-800">
+      <div style="margin-bottom: 20px; line-height: 1.6; color: #475569; font-size: 15px;">
+        <p id="service-modal-desc-main" style="font-weight: 600; color: #1e293b; margin-bottom: 8px;">
         </p>
-        <p id="service-modal-desc-secondary" class="text-slate-500 text-xs md:text-sm">
+        <p id="service-modal-desc-secondary" style="font-size: 13px; color: #64748b; margin: 0;">
         </p>
       </div>
 
       <!-- Key Benefits Bullet Points -->
-      <div class="mt-6 pt-6 border-t border-slate-100">
-        <h4 id="service-modal-features-title" class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Vorteile &amp; Spezifikationen</h4>
-        <ul id="service-modal-features-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs md:text-sm font-semibold text-slate-800">
+      <div style="border-top: 1px solid #f1f5f9; padding-top: 16px; margin-bottom: 24px;">
+        <h4 id="service-modal-features-title" style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Vorteile &amp; Spezifikationen</h4>
+        <ul id="service-modal-features-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; list-style: none; padding: 0; margin: 0; font-size: 13px; font-weight: 600; color: #1e293b;">
         </ul>
       </div>
 
       <!-- Action Footer -->
-      <div class="mt-8 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <a id="service-modal-cta" href="#contact" onclick="closeServiceDetailModal()" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3.5 rounded-xl shadow-lg shadow-blue-600/25 transition-all text-center text-sm">
+      <div style="border-top: 1px solid #f1f5f9; padding-top: 16px; display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center;">
+        <a id="service-modal-cta" href="#contact" onclick="closeServiceDetailModal()" style="background: #2563eb; color: #fff; font-weight: 700; padding: 12px 24px; border-radius: 12px; text-decoration: none; font-size: 14px; text-align: center;">
           <span>Unverbindliches Angebot anfordern</span> &rarr;
         </a>
-        <button onclick="closeServiceDetailModal()" class="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-5 py-3.5 rounded-xl transition-colors text-center text-sm cursor-pointer">
+        <button onclick="closeServiceDetailModal()" style="background: #f1f5f9; color: #334155; font-weight: 700; padding: 12px 20px; border-radius: 12px; border: none; font-size: 14px; cursor: pointer;">
           Schließen
         </button>
       </div>
@@ -1751,19 +1763,17 @@
   </div>
 
   <!-- Video Modal (Popup) -->
-  <div id="video-modal" class="fixed inset-0 z-[300] bg-slate-950/80 backdrop-blur-sm items-center justify-center p-4" style="display: none;" onclick="if(event.target === this) closeVideoModal()">
-    <div id="video-modal-card" class="bg-black rounded-2xl max-w-4xl w-full aspect-video relative overflow-hidden shadow-2xl border border-white/10 text-left">
+  <div id="video-modal-custom" onclick="if(event.target === this) closeVideoModal()">
+    <div style="position: relative; width: 100%; max-width: 860px; background: #000; border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8);">
       <!-- Close Button -->
-      <button id="close-video-btn" onclick="closeVideoModal()" class="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-black/60 hover:bg-black/80 border border-white/20 flex items-center justify-center text-white backdrop-blur transition-all cursor-pointer" aria-label="Close video">
-        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-      <!-- Video Player -->
-      <video id="modal-video-player" class="w-full h-full object-cover" controls preload="auto">
-        <source src="work.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-      </video>
+      <button id="close-video-btn" onclick="closeVideoModal()" style="position: absolute; top: 12px; right: 12px; z-index: 100; width: 36px; height: 36px; border-radius: 50%; background: rgba(0,0,0,0.7); color: #fff; border: 1px solid rgba(255,255,255,0.3); font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center;" aria-label="Close video">&times;</button>
+      <!-- Video Player Container -->
+      <div style="width: 100%; min-height: 320px; background: #000; display: flex; align-items: center; justify-content: center;">
+        <video id="modal-video-player" controls preload="auto" style="width: 100%; height: auto; max-height: 80vh; min-height: 300px; display: block; background: #000;">
+          <source src="work.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
     </div>
   </div>
 
