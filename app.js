@@ -711,6 +711,41 @@ document.addEventListener("DOMContentLoaded", () => {
       qSq: "Si funksionon procesi i ofertimit?",
       a: "Nach Ihrer Anfrage über unseren Online-Kalkulator prüfen wir die Details. Sie erhalten kurzfristig per E-Mail ein individuelles Festpreisangebot direkt über unser System.",
       aSq: "Pas kërkesës suaj përmes kalkulatorit tonë online, ne shqyrtojmë detajet. Ju do të pranoni shpejt me email një ofertë me çmim fiks direkt nga sistemi ynë."
+    },
+    {
+      id: "faq-4",
+      q: "Wie lange dauert ein Isolierungsprojekt?",
+      qSq: "Sa zgjat një projekt izolimi?",
+      a: "Die Dauer hängt vom Umfang und der Größe des Projekts ab. Kleinere Arbeiten können oft innerhalb eines Tages erledigt werden, größere Projekte planen wir transparent mit Ihnen.",
+      aSq: "Kohëzgjatja varet nga kapsam-i dhe madhësia e projektit. Punimet më të vogla shpesh përfundojnë brenda një dite, ndërsa projektet më të mëdha i planifikojmë së bashku me ju."
+    },
+    {
+      id: "faq-5",
+      q: "Bieten Sie eine kostenlose Vor-Ort-Besichtigung an?",
+      qSq: "A ofroni kontroll falas në vend?",
+      a: "Ja. Für eine genaue Einschätzung besichtigen wir Ihr Objekt, prüfen die Leitungen und besprechen die passende Dämmlösung direkt vor Ort.",
+      aSq: "Po. Për një vlerësim të saktë, ne e vizitojmë objektin tuaj, kontrollojmë gypat dhe diskutojmë zgjidhjen e përshtatshme të izolimit në vend."
+    },
+    {
+      id: "faq-6",
+      q: "Welche Dämmmaterialien verwenden Sie?",
+      qSq: "Çfarë materialesh izoluese përdorni?",
+      a: "Wir verwenden je nach Einsatzbereich hochwertige Mineralwolle, Kautschuk, Steinwolle und widerstandsfähige Blechummantelungen. Die Auswahl richtet sich nach Temperatur, Feuchtigkeit und den Anforderungen des Objekts.",
+      aSq: "Në varësi të përdorimit, ne përdorim lesh mineral, kauçuk, lesh guri dhe mbështjellës të qëndrueshëm prej llamarine. Zgjedhja varet nga temperatura, lagështia dhe kërkesat e objektit."
+    },
+    {
+      id: "faq-7",
+      q: "Arbeiten Sie auch für Unternehmen und Industrieanlagen?",
+      qSq: "A punoni edhe për kompani dhe objekte industriale?",
+      a: "Ja. Wir betreuen Privathaushalte, Gewerbebetriebe, Bürogebäude und industrielle Anlagen. Auch größere Projekte koordinieren wir zuverlässig und termingerecht.",
+      aSq: "Po. Ne punojmë për shtëpi private, biznese, ndërtesa zyrash dhe objekte industriale. Edhe projektet më të mëdha i koordinojmë me besueshmëri dhe në kohë."
+    },
+    {
+      id: "faq-8",
+      q: "Gibt es eine Garantie auf die ausgeführten Arbeiten?",
+      qSq: "A ofroni garanci për punimet e kryera?",
+      a: "Ja. Wir stehen für fachgerechte Ausführung und hochwertige Materialien. Die konkreten Garantiebedingungen besprechen wir transparent mit Ihnen im Angebot.",
+      aSq: "Po. Ne garantojmë punim profesional dhe materiale cilësore. Kushtet konkrete të garancisë i diskutojmë qartë me ju në ofertë."
     }
   ];
 
