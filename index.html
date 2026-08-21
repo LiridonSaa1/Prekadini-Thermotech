@@ -137,13 +137,13 @@
   </div>
 
   <!-- Hero Section -->
-  <section id="hero" class="relative hero-custom-bg overflow-hidden pt-20 pb-8 md:pt-28 md:pb-10 flex items-center min-h-screen">
+  <section id="hero" class="relative hero-custom-bg overflow-hidden pt-20 pb-16 md:pt-32 md:pb-24 flex items-center min-h-screen">
     <!-- Soft Decorative Bubbles/Shapes -->
     <div class="absolute w-[400px] h-[400px] rounded-full bg-blue-400/5 -top-12 -left-20 pointer-events-none"></div>
     <div class="absolute w-[300px] h-[300px] rounded-full bg-orange-400/5 bottom-10 right-1/3 pointer-events-none"></div>
 
-    <div class="max-w-[1024px] mx-auto px-4 md:px-8 w-full relative z-10">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+    <div class="max-w-[1440px] mx-auto px-4 md:px-8 w-full relative z-10">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         
         <!-- Left Column: Content -->
         <div class="lg:col-span-7 flex flex-col items-start text-left">
@@ -151,7 +151,7 @@
             TOP #1 WÄRME- & KÄLTESCHUTZ
           </span>
           
-          <h1 data-i18n="heroTitle" class="text-4xl sm:text-5xl lg:text-4xl font-extrabold tracking-tight text-slate-900 leading-tight">
+          <h1 data-i18n="heroTitle" class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 leading-tight">
             Professionelle Isolierung Für jedes Objekt.
           </h1>
           
@@ -176,19 +176,17 @@
             </button>
           </div>
 
-          <!-- Metrics kept close to the hero content -->
-          <div class="mt-10 md:mt-12 pt-0 grid grid-cols-3 gap-4 md:gap-8 w-full max-w-3xl">
-            <div>
-              <span data-i18n="metricProjectsVal" class="text-3xl md:text-4xl font-extrabold tracking-tight block"><span class="metric-outline">2.5K</span><span class="metric-plus">+</span></span>
-              <span data-i18n="metricProjectsLbl" class="text-xs md:text-sm text-slate-500 font-semibold uppercase tracking-wider mt-1 block">Erfolgreiche Einsätze</span>
+          <!-- Desktop rating card directly below the hero actions -->
+          <div class="hidden lg:flex mt-8 bg-white/90 backdrop-blur-lg border border-white/60 p-3.5 rounded-2xl shadow-xl items-center space-x-3 w-64">
+            <div class="flex -space-x-2 avatar-stack shrink-0">
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=100" alt="Reviewer" class="w-8 h-8 rounded-full object-cover border-2 border-white">
+              <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=100" alt="Reviewer" class="w-8 h-8 rounded-full object-cover border-2 border-white">
+              <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=100" alt="Reviewer" class="w-8 h-8 rounded-full object-cover border-2 border-white">
             </div>
             <div>
-              <span data-i18n="metricSatisfactionVal" class="text-3xl md:text-4xl font-extrabold tracking-tight block"><span class="metric-outline">98</span><span class="metric-plus">%</span></span>
-              <span data-i18n="metricSatisfactionLbl" class="text-xs md:text-sm text-slate-500 font-semibold uppercase tracking-wider mt-1 block">Kundenzufriedenheit</span>
-            </div>
-            <div>
-              <span data-i18n="metricYearsVal" class="text-3xl md:text-4xl font-extrabold tracking-tight block"><span class="metric-outline">23</span><span class="metric-plus">+</span></span>
-              <span data-i18n="metricYearsLbl" class="text-xs md:text-sm text-slate-500 font-semibold uppercase tracking-wider mt-1 block">Jahre Erfahrung</span>
+              <div class="text-amber-500 text-xs tracking-tight">★★★★★</div>
+              <p data-i18n="ratingText" class="text-xs font-bold text-slate-800 -mt-0.5">Ratings 4.9/5</p>
+              <p data-i18n="ratingSubtext" class="text-[10px] text-slate-500 font-semibold leading-none">Verifizierte Google Bewertungen</p>
             </div>
           </div>
         </div>
@@ -220,7 +218,7 @@
         </div>
 
         <!-- Desktop Only Column (Absolute positioned touching bottom edge) -->
-        <div class="hidden lg:flex absolute bottom-[-120px] right-[8%] h-[120%] w-[480px] items-end justify-center z-20">
+        <div class="hidden lg:flex absolute bottom-[-194px] right-[4%] h-[147%] w-[620px] items-end justify-center z-20">
           <div class="relative w-full h-full flex items-end justify-center select-none">
             <!-- Decorative colored back-plate matching image alignment -->
             <div class="absolute inset-0 bg-blue-600/5 rounded-full blur-3xl pointer-events-none"></div>
@@ -228,7 +226,7 @@
             <img src="worker.png" alt="Prekadini ThermoTech Dämmung Spezialist" class="relative z-10 h-full w-auto object-contain drop-shadow-[0_25px_45px_rgba(37,99,235,0.18)] hover:scale-[1.02] transition-transform duration-300">
             
             <!-- Floating Ratings widget (exactly matching reference image overlay placement) -->
-            <div class="absolute bottom-72 -left-12 z-30 bg-white/90 backdrop-blur-lg border border-white/50 p-4 rounded-2xl shadow-xl flex items-center space-x-4 w-64">
+            <div class="hidden absolute bottom-72 -left-12 z-30 bg-white/90 backdrop-blur-lg border border-white/50 p-4 rounded-2xl shadow-xl flex items-center space-x-4 w-64">
               <div class="flex -space-x-2.5 avatar-stack">
                 <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=100" alt="Reviewer" class="w-9 h-9 rounded-full object-cover border-2 border-white">
                 <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=100" alt="Reviewer" class="w-9 h-9 rounded-full object-cover border-2 border-white">
@@ -251,6 +249,26 @@
 
       </div>
 
+    </div>
+  </section>
+
+  <!-- Metrics below the hero section -->
+  <section id="hero-metrics" class="bg-white py-8 md:py-10 relative z-30">
+    <div class="max-w-[1440px] mx-auto px-4 md:px-8">
+      <div class="grid grid-cols-3 gap-4 md:gap-8 max-w-3xl mx-auto w-full">
+        <div>
+          <span data-i18n="metricProjectsVal" class="text-3xl md:text-4xl font-extrabold tracking-tight block"><span class="metric-outline">2.5K</span><span class="metric-plus">+</span></span>
+          <span data-i18n="metricProjectsLbl" class="text-xs md:text-sm text-slate-500 font-semibold uppercase tracking-wider mt-1 block">Erfolgreiche Einsätze</span>
+        </div>
+        <div>
+          <span data-i18n="metricSatisfactionVal" class="text-3xl md:text-4xl font-extrabold tracking-tight block"><span class="metric-outline">98</span><span class="metric-plus">%</span></span>
+          <span data-i18n="metricSatisfactionLbl" class="text-xs md:text-sm text-slate-500 font-semibold uppercase tracking-wider mt-1 block">Kundenzufriedenheit</span>
+        </div>
+        <div>
+          <span data-i18n="metricYearsVal" class="text-3xl md:text-4xl font-extrabold tracking-tight block"><span class="metric-outline">23</span><span class="metric-plus">+</span></span>
+          <span data-i18n="metricYearsLbl" class="text-xs md:text-sm text-slate-500 font-semibold uppercase tracking-wider mt-1 block">Jahre Erfahrung</span>
+        </div>
+      </div>
     </div>
   </section>
 
