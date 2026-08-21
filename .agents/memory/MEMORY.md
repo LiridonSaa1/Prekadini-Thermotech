@@ -1,0 +1,1 @@
+- [Imported static app runtime](imported-static-app-runtime.md) — use Node for the preview server because Python is unavailable in this environment.
