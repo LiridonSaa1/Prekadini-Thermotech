@@ -137,44 +137,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Video Modal Player Control ---
   const playVideoBtn = document.getElementById("play-video-btn");
-  const videoModal = document.getElementById("video-modal");
-  const videoModalCard = document.getElementById("video-modal-card");
   const closeVideoBtn = document.getElementById("close-video-btn");
-  const videoPlayer = document.getElementById("modal-video-player");
+  const videoModalEl = document.getElementById("video-modal");
 
-  if (playVideoBtn && videoModal && videoModalCard && closeVideoBtn && videoPlayer) {
-    const openVideoModal = () => {
-      videoModal.classList.remove("opacity-0", "pointer-events-none");
-      videoModal.classList.add("opacity-100", "pointer-events-auto");
-      videoModalCard.classList.remove("scale-95", "opacity-0");
-      videoModalCard.classList.add("scale-100", "opacity-100");
-      videoPlayer.load();
-      videoPlayer.play().catch(err => console.log("Autoplay prevented:", err));
-    };
-
-    const closeVideoModal = () => {
-      videoPlayer.pause();
-      videoModalCard.classList.remove("scale-100", "opacity-100");
-      videoModalCard.classList.add("scale-95", "opacity-0");
-      videoModal.classList.remove("opacity-100", "pointer-events-auto");
-      videoModal.classList.add("opacity-0", "pointer-events-none");
-    };
-
-    playVideoBtn.addEventListener("click", openVideoModal);
-    closeVideoBtn.addEventListener("click", closeVideoModal);
-    
-    videoModal.addEventListener("click", (e) => {
-      if (e.target === videoModal) {
-        closeVideoModal();
-      }
-    });
-
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && !videoModal.classList.contains("opacity-0")) {
-        closeVideoModal();
+  if (playVideoBtn) playVideoBtn.addEventListener("click", () => window.openVideoModal());
+  if (closeVideoBtn) closeVideoBtn.addEventListener("click", () => window.closeVideoModal());
+  
+  if (videoModalEl) {
+    videoModalEl.addEventListener("click", (e) => {
+      if (e.target === videoModalEl) {
+        window.closeVideoModal();
       }
     });
   }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && videoModalEl && !videoModalEl.classList.contains("opacity-0")) {
+      window.closeVideoModal();
+    }
+  });
 
   // --- Interactive Multi-Step Inquiry Form ---
   let currentInquiryStep = 1;
@@ -195,40 +176,66 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const initFormState = () => {
+    window.selectService("Heizungsrohrdämmung");
+    window.selectObject("Gewerbe / Industrie");
     updateLiveOverview();
   };
 
   window.selectService = (name) => {
-    inquiryData.service = name;
+    if (name) inquiryData.service = name;
     
-    // Manage active class on cards
-    document.querySelectorAll("#step-content-1 .service-card").forEach((card) => {
+    // Manage active class on service cards
+    const cards = document.querySelectorAll("#step-content-1 .service-card");
+    let matched = false;
+
+    cards.forEach((card) => {
+      const onclickAttr = card.getAttribute("onclick") || "";
       const textSpan = card.querySelector("span");
-      if (textSpan && textSpan.innerText === name) {
-        card.classList.add("border-blue-600", "bg-blue-50/20");
-        card.classList.remove("border-slate-100", "bg-slate-50");
+      const cardText = textSpan ? textSpan.innerText.trim() : "";
+      
+      if ((name && (onclickAttr.includes(`'${name}'`) || onclickAttr.includes(`"${name}"`) || cardText === name.trim())) || (!matched && !name)) {
+        card.classList.add("active");
+        if (textSpan) inquiryData.service = textSpan.innerText.trim();
+        matched = true;
       } else {
-        card.classList.remove("border-blue-600", "bg-blue-50/20");
-        card.classList.add("border-slate-100", "bg-slate-50");
+        card.classList.remove("active");
       }
     });
+
+    if (!matched && cards.length > 0) {
+      cards[0].classList.add("active");
+      const firstSpan = cards[0].querySelector("span");
+      if (firstSpan) inquiryData.service = firstSpan.innerText.trim();
+    }
 
     updateLiveOverview();
   };
 
   window.selectObject = (name) => {
-    inquiryData.object = name;
+    if (name) inquiryData.object = name;
     
-    document.querySelectorAll("#step-content-2 .object-card").forEach((card) => {
+    const cards = document.querySelectorAll("#step-content-2 .object-card");
+    let matched = false;
+
+    cards.forEach((card) => {
+      const onclickAttr = card.getAttribute("onclick") || "";
       const textSpan = card.querySelector("span");
-      if (textSpan && textSpan.innerText === name) {
-        card.classList.add("border-blue-600", "bg-blue-50/20");
-        card.classList.remove("border-slate-100", "bg-slate-50");
+      const cardText = textSpan ? textSpan.innerText.trim() : "";
+      
+      if ((name && (onclickAttr.includes(`'${name}'`) || onclickAttr.includes(`"${name}"`) || cardText === name.trim())) || (!matched && !name)) {
+        card.classList.add("active");
+        if (textSpan) inquiryData.object = textSpan.innerText.trim();
+        matched = true;
       } else {
-        card.classList.remove("border-blue-600", "bg-blue-50/20");
-        card.classList.add("border-slate-100", "bg-slate-50");
+        card.classList.remove("active");
       }
     });
+
+    if (!matched && cards.length > 0) {
+      cards[0].classList.add("active");
+      const firstSpan = cards[0].querySelector("span");
+      if (firstSpan) inquiryData.object = firstSpan.innerText.trim();
+    }
 
     updateLiveOverview();
   };
@@ -749,7 +756,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   ];
 
-  let activeFaqId = "faq-1";
+  let activeFaqId = null;
 
   window.toggleFaq = (id) => {
     activeFaqId = activeFaqId === id ? null : id;
@@ -884,24 +891,64 @@ document.addEventListener("DOMContentLoaded", () => {
       // 2. Fetch & Render Services
       const services = await ServiceManager.fetchServices();
 
+        // Helper to pick appropriate SVG icon per service
+        const getServiceIcon = (title) => {
+          const t = (title || "").toLowerCase();
+          if (t.includes("heizung") || t.includes("wärme") || t.includes("unterhalt")) {
+            return {
+              bg: "bg-orange-50 border border-orange-200/60 text-orange-600",
+              svg: `<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" /></svg>`
+            };
+          }
+          if (t.includes("kälte") || t.includes("büro") || t.includes("klima")) {
+            return {
+              bg: "bg-blue-50 border border-blue-200/60 text-blue-600",
+              svg: `<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07L19.07 4.93M12 6L9 9M12 6l3 3M12 18l-3-3M12 18l3-3M6 12l3-3M6 12l3 3M18 12l-3-3M18 12l-3 3" /></svg>`
+            };
+          }
+          if (t.includes("blech") || t.includes("glas") || t.includes("fenster")) {
+            return {
+              bg: "bg-slate-100 border border-slate-200 text-slate-700",
+              svg: `<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>`
+            };
+          }
+          if (t.includes("armatur") || t.includes("bau")) {
+            return {
+              bg: "bg-amber-50 border border-amber-200/60 text-amber-600",
+              svg: `<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /></svg>`
+            };
+          }
+          if (t.includes("brand") || t.includes("sonder")) {
+            return {
+              bg: "bg-red-50 border border-red-200/60 text-red-600",
+              svg: `<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>`
+            };
+          }
+          return {
+            bg: "bg-emerald-50 border border-emerald-200/60 text-emerald-600",
+            svg: `<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>`
+          };
+        };
+
         // Also update the calculator selection
         const calculatorServicesContainer = document.querySelector('#step-content-1 .grid');
         if (calculatorServicesContainer) {
           calculatorServicesContainer.innerHTML = "";
           services.forEach((srv, index) => {
+            const iconObj = getServiceIcon(srv.title);
             const srvCard = document.createElement("div");
             srvCard.setAttribute("onclick", `selectService('${srv.title}')`);
             srvCard.id = `service-opt-${index + 1}`;
-            srvCard.className = `service-card bg-slate-50 border ${index === 0 ? 'border-blue-600 bg-blue-50/20' : 'border-slate-100'} rounded-2xl p-4 flex flex-col items-center justify-center cursor-pointer hover:border-blue-300 hover:bg-blue-50/20 transition-all text-center`;
+            srvCard.className = `service-card bg-white border border-slate-200/80 rounded-2xl p-5 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:shadow-lg hover:-translate-y-0.5 transition-all text-center group relative ${index === 0 ? 'active' : ''}`;
             srvCard.innerHTML = `
-              <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center mb-3 text-lg font-bold">
-                ${srv.title.charAt(0)}
+              <div class="w-12 h-12 rounded-2xl ${iconObj.bg} flex items-center justify-center mb-3.5 group-hover:scale-110 transition-transform">
+                ${iconObj.svg}
               </div>
-              <span class="text-xs font-bold text-slate-700 leading-tight">${srv.title}</span>
+              <span class="text-xs font-bold text-slate-800 leading-snug">${srv.title}</span>
             `;
             calculatorServicesContainer.appendChild(srvCard);
           });
-          selectService(services[0].title);
+          window.selectService(services[0].title);
         }
 
       // 3. Fetch & Render Gallery Projects
@@ -1036,7 +1083,7 @@ document.addEventListener("DOMContentLoaded", () => {
       icon: `<svg class="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>`,
       text: "Präzise Dämmverfahren, hochwertige Materialien (z.B. Steinwolle, Kautschuk) und makellose Ausführung sorgen für dauerhafte Energieeffizienz und höchste Einsparung.",
       textSq: "Metoda precize të izolimit, materiale cilësore (p.sh. lesh guri, kautshuk) dhe ekzekutim i përsosur sigurojnë efikasitet të qëndrueshëm të energjisë dhe kursime maksimale.",
-      image: "warmeschutz.jpg",
+      image: "feature_ergebnisse.jpg",
       badgeTitle: "Beste Ergebnisse & Qualität",
       badgeTitleSq: "Rezultatet më të mira & Cilësi",
       badgeLabel: "Qualitätsstandard",
@@ -1049,7 +1096,7 @@ document.addEventListener("DOMContentLoaded", () => {
       icon: `<svg class="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>`,
       text: "Unsere Fachkräfte sind zertifiziert, langjährig erfahren und arbeiten präzise nach den anerkannten WKSB-Regeln der Technik und aktuellen GEG-Vorgaben.",
       textSq: "Specialistët tanë janë të certifikuar, me përvojë shumëvjeçare dhe punojnë saktësisht sipas rregullave të pranuara teknike WKSB dhe direktivave të GEG.",
-      image: "kaelteschutz.jpg",
+      image: "feature_team.jpg",
       badgeTitle: "Erfahrenes Team",
       badgeTitleSq: "Staf me përvojë",
       badgeLabel: "Zertifiziert",
@@ -1062,7 +1109,7 @@ document.addEventListener("DOMContentLoaded", () => {
       icon: `<svg class="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`,
       text: "Flexible Zeiteinteilung, rasche Reaktionszeiten und unkomplizierte Terminabsprachen sichern eine reibungslose Projektdurchführung ohne Betriebsunterbrechungen.",
       textSq: "Planifikimi fleksibil i kohës, kohë e shpejtë e reagimit dhe koordinimi i thjeshtë sigurojnë zbatimin e qetë të projektit pa ndërprerje të punës.",
-      image: "brandschutz.jpg",
+      image: "feature_service.jpg",
       badgeTitle: "Flexibler Projekt-Ablauf",
       badgeTitleSq: "Proces Fleksibil i Projektit",
       badgeLabel: "Termintreue",
@@ -1075,7 +1122,7 @@ document.addEventListener("DOMContentLoaded", () => {
       icon: `<svg class="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>`,
       text: "Ihre Zufriedenheit ist unser oberstes Qualitätsversprechen. Sollte ein Detail nicht Ihren Wünschen entsprechen, bessern wir es unverzüglich kostenfrei nach.",
       textSq: "Kënaqësia juaj është premtimi ynë kryesor i cilësisë. Nëse një detaj nuk përputhet me dëshirat tuaja, ne e përmirësojmë menjëherë pa asnjë pagesë.",
-      image: "worker.png",
+      image: "feature_garantie.jpg",
       badgeTitle: "Zufriedenheitsversprechen",
       badgeTitleSq: "Prometim Kënaqësie",
       badgeLabel: "Kostenfreie Nachbesserung",
@@ -1096,7 +1143,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const overlayBadgeLabel = document.getElementById("service-overlay-badge-label");
     const overlaySubtext = document.getElementById("service-overlay-subtext");
 
-    if (sliderImg) sliderImg.src = data.image;
+    if (sliderImg) {
+      sliderImg.style.opacity = "0.3";
+      setTimeout(() => {
+        sliderImg.src = data.image;
+        sliderImg.style.opacity = "1";
+      }, 150);
+    }
     if (overlayBadgeTitle) overlayBadgeTitle.innerText = isSq ? data.badgeTitleSq : data.badgeTitle;
     if (overlayBadgeLabel) overlayBadgeLabel.innerText = isSq ? data.badgeLabelSq : data.badgeLabel;
     if (overlaySubtext) overlaySubtext.innerText = isSq ? data.titleSq : data.title;
@@ -1105,9 +1158,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const dot = document.getElementById(`service-dot-${i}`);
       if (dot) {
         if (i === index) {
-          dot.className = "w-2.5 h-2.5 rounded-full bg-blue-600 cursor-pointer transition-all duration-300";
+          dot.className = "w-3 h-3 rounded-full bg-blue-600 cursor-pointer transition-all duration-300 transform scale-110 shadow-sm";
         } else {
-          dot.className = "w-2.5 h-2.5 rounded-full bg-slate-300 cursor-pointer transition-all duration-300";
+          dot.className = "w-2.5 h-2.5 rounded-full bg-slate-300 cursor-pointer transition-all duration-300 hover:bg-slate-400";
         }
       }
     }
@@ -1169,6 +1222,15 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      const modal = document.getElementById("service-detail-modal");
+      if (modal && !modal.classList.contains("opacity-0")) {
+        window.closeServiceDetailModal();
+      }
+    }
+  });
+
   // --- INITIALIZATION TRIGGERS ---
   initFormState();
   loadApprovedReviews();
@@ -1178,3 +1240,224 @@ document.addEventListener("DOMContentLoaded", () => {
     window.setServiceActive(0);
   }
 });
+
+// Global video modal helpers available unconditionally
+window.openVideoModal = function() {
+  const videoModal = document.getElementById("video-modal");
+  const videoModalCard = document.getElementById("video-modal-card");
+  const videoPlayer = document.getElementById("modal-video-player");
+  if (videoModal && videoModalCard) {
+    videoModal.style.display = "flex";
+    videoModal.style.opacity = "1";
+    videoModal.style.pointerEvents = "auto";
+    videoModal.classList.remove("hidden", "opacity-0", "pointer-events-none");
+    videoModal.classList.add("flex", "opacity-100", "pointer-events-auto");
+
+    videoModalCard.style.opacity = "1";
+    videoModalCard.style.transform = "scale(1)";
+    videoModalCard.classList.remove("scale-95", "opacity-0");
+    videoModalCard.classList.add("scale-100", "opacity-100");
+    if (videoPlayer) {
+      videoPlayer.currentTime = 0;
+      videoPlayer.play().catch(err => console.log("Autoplay prevented:", err));
+    }
+  }
+};
+
+window.closeVideoModal = function() {
+  const videoModal = document.getElementById("video-modal");
+  const videoModalCard = document.getElementById("video-modal-card");
+  const videoPlayer = document.getElementById("modal-video-player");
+  if (videoModal && videoModalCard) {
+    if (videoPlayer) {
+      videoPlayer.pause();
+    }
+    videoModal.style.opacity = "0";
+    videoModal.style.pointerEvents = "none";
+    videoModalCard.style.opacity = "0";
+    videoModalCard.style.transform = "scale(0.95)";
+    setTimeout(() => {
+      videoModal.style.display = "none";
+      videoModal.classList.add("hidden", "opacity-0", "pointer-events-none");
+      videoModal.classList.remove("flex", "opacity-100", "pointer-events-auto");
+    }, 200);
+  }
+};
+
+// Global Service Detail Modal Data & Functions
+const serviceModalData = {
+  warm: {
+    title: "Wärmeschutz",
+    titleSq: "Izolimi Termik (Wärmeschutz)",
+    badge: "Höchste Energieeinsparung",
+    badgeSq: "Efikasitet Maksimal Energjie",
+    img: "feature_ergebnisse.jpg",
+    caption: "Hochwertige Wärmedämmung mit Blechummantelung",
+    captionSq: "Izolim termik me mbështjellës metalik",
+    icon: `<svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9.879z" /></svg>`,
+    descMain: "Professionelle Wärmedämmung für Rohrleitungen, Heizungsanlagen, Warmwasser- und Dampfleitungen in Industrie und Gewerbe. Durch den Einsatz moderner Dämmstoffe wie Steinwolle und Kautschuk mit Blechummantelung reduzieren wir Energieverluste um bis zu 85%.",
+    descMainSq: "Izolim termik profesional për tubacione, sisteme ngrohjeje, ujë të ngrohtë dhe linja avulli në industri dhe objekte komerciale. Përmes materialeve më moderne si lesh guri dhe kautshuk me mbështjellës metalik, ne reduktojmë humbjet e energjisë deri në 85%.",
+    descSecondary: "Exakte Passform für Armaturen, Ventile und Verteiler sorgt für makellose Optik und dauerhaften Schutz vor mechanischen Belastungen.",
+    descSecondarySq: "Përshtatja me precizion për valvulat, armaturat dhe shpërndarësit siguron pamje të përsosur dhe mbrojtje të qëndrueshme ndaj goditjeve mekanike.",
+    features: [
+      "Bis zu 85% weniger Wärmeverlust",
+      "Schutz vor Verbrennungen an Oberflächen",
+      "Aluminium- & Edelstahl-Blechmantel",
+      "Normgerecht nach GEG & WKSB Standards"
+    ],
+    featuresSq: [
+      "Deri në 85% më pak humbje nxehtësie",
+      "Mbrojtje nga djegiet në sipërfaqe",
+      "Mbështjellës me fletë alumini & inox",
+      "Përputhshmëri me normat GEG & WKSB"
+    ]
+  },
+  kalt: {
+    title: "Kälteschutz",
+    titleSq: "Izolimi i Ftohjes (Kälteschutz)",
+    badge: "Tauwasserschutz & Korrosionsschutz",
+    badgeSq: "Mbrojtje nga Kondensimi & Korrozioni",
+    img: "feature_team.jpg",
+    caption: "Diffusionsdichte Kälteisolierung für Klimaanlagen",
+    captionSq: "Izolim difuziv ftohës për klimë & ujë të ftohtë",
+    icon: `<svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07L19.07 4.93M12 6L9 9M12 6l3 3M12 18l-3-3M12 18l3-3M6 12l3-3M6 12l3 3M18 12l-3-3M18 12l-3 3" /></svg>`,
+    descMain: "Zuverlässige Isolierung von Kälte- und Klimaleitungen, Eiswasser- und Kühlmittelkreisläufen. Verhindert effizient die Bildung von Kondenswasser (Tauwasser), beugt Korrosionsschäden vor und sichert den unterbrechungsfreien Betrieb von Kühlanlagen.",
+    descMainSq: "Izolim i besueshëm i linjave të ftohjes, klimatizimit dhe ujit të ftohtë. Parandalon me efikasitet formimin e ujit të kondensuar, parandalon dëmtimet nga korrozioni dhe siguron funksionimin pa ndërprerje të sistemeve ftohëse.",
+    descSecondary: "Spezielle geschlossenzellige Elastomerdämmstoffe garantieren einen dauerhaft hohen Wasserdampf-Diffusionswiderstand.",
+    descSecondarySq: "Materialet speciale elastomerike me qeliza të mbyllura garantojnë rezistencë të lartë ndaj avullit të ujit për një kohë të gjatë.",
+    features: [
+      "100% Verhinderung von Tauwasserbildung",
+      "Dauerhafter Schutz vor Rohrkorrosion",
+      "Qualitätsdämmung (Armaflex / Kaiflex)",
+      "Stabile Temperaturen in Kühlsystemen"
+    ],
+    featuresSq: [
+      "100% parandalim i formimit të pikave të ujit",
+      "Mbrojtje e përhershme nga korrozioni i tubave",
+      "Izolim cilësor (Armaflex / Kaiflex)",
+      "Temperaturë e qëndrueshme në ftohje"
+    ]
+  },
+  schall: {
+    title: "Schallschutz",
+    titleSq: "Izolimi Akustik (Schallschutz)",
+    badge: "Lärmreduzierung & Akustik",
+    badgeSq: "Reduktim i Zhurmës & Akustikë",
+    img: "feature_garantie.jpg",
+    caption: "Effektive Schallisolierung an Lüftungs- & Abwasserrohren",
+    captionSq: "Izolim akustik efektiv në tubacione shkarkimi & ajri",
+    icon: `<svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>`,
+    descMain: "Effektive Schallisolierung von Abwasser- und Regenwasserleitungen, Lüftungskanälen und Maschinenräumen. Wir reduzieren Fließ- und Luftschallgeräusche drastisch für ein angenehmes Arbeits- und Wohnklima.",
+    descMainSq: "Izolim efektiv akustik i tubacioneve të shkarkimit, ujërave të shiut, kanaleve të ventilimit dhe dhomave të makinerive. Ne reduktojmë dukshëm zhurmat e rrjedhjes dhe ajrit për një ambient me komoditet të lartë.",
+    descSecondary: "Durch Entkopplung der Rohre vom Baukörper verhindern wir die Übertragung von Körperschall in angrenzende Räume.",
+    descSecondarySq: "Përmes shkëputjes së tubave nga struktura e ndërtesës ne parandalojmë transmetimin e vibrimeve dhe zhurmave në dhomat ngjitur.",
+    features: [
+      "Starke Dämpfung von Fließgeräuschen",
+      "Spezielle Schwerschicht-Schallmatten",
+      "Einhaltung des Schallschutzes nach DIN 4109",
+      "Gesteigerter Lebens- & Arbeitskomfort"
+    ],
+    featuresSq: [
+      "Reduktim i madh i zhurmave të rrjedhës",
+      "Shtresa speciale të rënda akustike",
+      "Standarde të certifikuara sipas DIN 4109",
+      "Komoditet më i lartë në punë dhe banim"
+    ]
+  },
+  brand: {
+    title: "Brandschutz",
+    titleSq: "Mbrojtja kundër Zjarrit (Brandschutz)",
+    badge: "Zertifizierte Brandabschottung",
+    badgeSq: "Abschottung e Certifikuar Kundër Zjarrit",
+    img: "feature_service.jpg",
+    caption: "Zertifizierte Rohrdurchführungen R90 / S90",
+    captionSq: "Penetrime tubash të certifikuara R90 / S90",
+    icon: `<svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>`,
+    descMain: "Gesetzlich zertifizierte Brandabschottungen (S90, S120, R90) und feuerfeste Durchführungen von Rohren und Kabeln durch Wände und Decken. Beugt der Ausbreitung von Feuer und Rauch im Ernstfall zuverlässig vor.",
+    descMainSq: "Abschottung dhe penetrime rezistente ndaj zjarrit të certifikuara me ligj (S90, S120, R90) për tubacione dhe kabllo përmes mureve dhe tavaneve. Parandalon me besueshmëri përhapjen e zjarrit dhe tymit.",
+    descSecondary: "Vollständige Kennzeichnung mit Prüfschildern und Dokumentation für die behördliche Bauabnahme.",
+    descSecondarySq: "Markim i plotë me tabela certifikimi dhe dokumentacion për pranimin zyrtar të ndërtimit.",
+    features: [
+      "Feuerwiderstandsklassen R90 / S90 / S120",
+      "Geprüfte Marken-Brandschutzbaustoffe",
+      "Vollständige Dokumentation & Abnahme",
+      "Schutz von Rauchübertragung bei Brand"
+    ],
+    featuresSq: [
+      "Klasat e rezistencës ndaj zjarrit R90 / S90 / S120",
+      "Materiale të certifikuara nga prodhuesit kryesorë",
+      "Dokumentacion i plotë & pranim zyrtar",
+      "Mbrojtje nga kalimi i tymit në rast zjarri"
+    ]
+  }
+};
+
+window.openServiceDetailModal = function(key) {
+  const data = serviceModalData[key];
+  if (!data) return;
+
+  const modal = document.getElementById("service-detail-modal");
+  const card = document.getElementById("service-detail-modal-card");
+  const isSq = document.documentElement.lang === "sq";
+
+  if (!modal || !card) return;
+
+  const iconContainer = document.getElementById("service-modal-icon-container");
+  const badgeEl = document.getElementById("service-modal-badge");
+  const titleEl = document.getElementById("service-modal-title");
+  const imgEl = document.getElementById("service-modal-img");
+  const captionEl = document.getElementById("service-modal-img-caption");
+  const descMainEl = document.getElementById("service-modal-desc-main");
+  const descSecondaryEl = document.getElementById("service-modal-desc-secondary");
+
+  if (iconContainer) iconContainer.innerHTML = data.icon;
+  if (badgeEl) badgeEl.innerText = isSq ? data.badgeSq : data.badge;
+  if (titleEl) titleEl.innerText = isSq ? data.titleSq : data.title;
+  if (imgEl) imgEl.src = data.img;
+  if (captionEl) captionEl.innerText = isSq ? data.captionSq : data.caption;
+  if (descMainEl) descMainEl.innerText = isSq ? data.descMainSq : data.descMain;
+  if (descSecondaryEl) descSecondaryEl.innerText = isSq ? data.descSecondarySq : data.descSecondary;
+
+  const featuresList = document.getElementById("service-modal-features-list");
+  if (featuresList) {
+    featuresList.innerHTML = "";
+    const list = isSq ? data.featuresSq : data.features;
+    list.forEach((item) => {
+      const li = document.createElement("li");
+      li.className = "flex items-start space-x-2 bg-slate-50 p-2.5 rounded-xl border border-slate-100";
+      li.innerHTML = `
+        <svg class="w-4 h-4 text-blue-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+        </svg>
+        <span>${item}</span>
+      `;
+      featuresList.appendChild(li);
+    });
+  }
+
+  modal.style.display = "flex";
+  modal.style.opacity = "1";
+  modal.style.pointerEvents = "auto";
+  modal.classList.remove("hidden", "opacity-0", "pointer-events-none");
+  modal.classList.add("flex", "opacity-100", "pointer-events-auto");
+
+  card.style.opacity = "1";
+  card.style.transform = "scale(1)";
+  card.classList.remove("scale-95", "opacity-0");
+  card.classList.add("scale-100", "opacity-100");
+};
+
+window.closeServiceDetailModal = function() {
+  const modal = document.getElementById("service-detail-modal");
+  const card = document.getElementById("service-detail-modal-card");
+  if (!modal || !card) return;
+
+  modal.style.opacity = "0";
+  modal.style.pointerEvents = "none";
+  card.style.opacity = "0";
+  card.style.transform = "scale(0.95)";
+
+  setTimeout(() => {
+    modal.style.display = "none";
+  }, 300);
+};

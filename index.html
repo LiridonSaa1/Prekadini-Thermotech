@@ -57,6 +57,82 @@
       background-color: rgb(206, 222, 255);
       background-image: linear-gradient(rgb(206, 222, 255) 0%, rgb(206, 222, 255) 76%, rgb(221, 232, 255) 84%, rgb(238, 244, 255) 92%, rgb(255, 255, 255) 100%);
     }
+
+    /* --- GLASSMORPHISM CARDS STYLING --- */
+    .glass-card {
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.88) 0%,
+        rgba(255, 255, 255, 0.60) 50%,
+        rgba(239, 246, 255, 0.70) 100%
+      );
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1.5px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 
+        0 12px 35px -5px rgba(37, 99, 235, 0.08),
+        0 4px 16px 0 rgba(0, 0, 0, 0.03),
+        inset 0 1px 1px 0 rgba(255, 255, 255, 0.9);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .glass-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(
+        circle,
+        rgba(37, 99, 235, 0.12) 0%,
+        rgba(255, 255, 255, 0) 65%
+      );
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+    }
+
+    .glass-card:hover {
+      transform: translateY(-4px) scale(1.01);
+      border-color: rgba(147, 197, 253, 0.85);
+      box-shadow: 
+        0 22px 45px -10px rgba(37, 99, 235, 0.18),
+        0 8px 24px 0 rgba(37, 99, 235, 0.1),
+        inset 0 1px 2px 0 rgba(255, 255, 255, 1);
+    }
+
+    .glass-card:hover::before {
+      opacity: 1;
+    }
+
+    .glass-text {
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.45);
+      background: linear-gradient(
+        120deg,
+        rgba(255, 255, 255, 0.95),
+        rgba(255, 255, 255, 0.35),
+        rgba(255, 255, 255, 0.8)
+      );
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+
+      text-shadow:
+        0 1px 1px rgba(255, 255, 255, 0.4),
+        0 4px 20px rgba(255, 255, 255, 0.15);
+    }
+
+    .glass-icon-box {
+      background: linear-gradient(135deg, rgba(239, 246, 255, 0.95) 0%, rgba(219, 234, 254, 0.7) 100%);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1.5px dashed rgba(59, 130, 246, 0.4);
+      box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.12), inset 0 1px 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
     /* Hide scrollbar for Chrome, Safari and Opera */
     #about-slider::-webkit-scrollbar {
       display: none;
@@ -65,6 +141,134 @@
     #about-slider {
       -ms-overflow-style: none;  /* IE and Edge */
       scrollbar-width: none;  /* Firefox */
+    }
+
+    /* Glassmorphism & Custom Glow Effects requested by user */
+    .glass-text {
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.45);
+      background: linear-gradient(
+        120deg,
+        rgba(255,255,255,0.95),
+        rgba(255,255,255,0.35),
+        rgba(255,255,255,0.8)
+      );
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+
+      text-shadow:
+        0 1px 1px rgba(255,255,255,0.4),
+        0 4px 20px rgba(255,255,255,0.15);
+    }
+
+    .glass-icon-circle {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(240, 246, 255, 0.5) 100%);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1.5px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 
+        0 10px 30px 0 rgba(37, 99, 235, 0.12),
+        inset 0 0 15px rgba(255, 255, 255, 0.9),
+        0 0 20px 2px rgba(59, 130, 246, 0.15);
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+    }
+
+    .glass-icon-circle::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 9999px;
+      padding: 2px;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.6), rgba(147, 197, 253, 0.2), rgba(255, 255, 255, 0.8));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    .glass-icon-circle:hover {
+      transform: translateY(-8px) scale(1.08);
+      box-shadow: 
+        0 16px 40px 0 rgba(37, 99, 235, 0.25),
+        inset 0 0 20px rgba(255, 255, 255, 0.95),
+        0 0 35px 8px rgba(37, 99, 235, 0.35);
+      border-color: rgba(59, 130, 246, 0.8);
+    }
+
+    .glass-icon-circle:hover .glass-step-svg {
+      transform: scale(1.15) rotate(4deg);
+      filter: drop-shadow(0 4px 12px rgba(37, 99, 235, 0.5));
+    }
+
+    .glass-step-svg {
+      transition: transform 0.3s ease, filter 0.3s ease;
+    }
+
+    .glass-badge-number {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      width: 26px;
+      height: 26px;
+      border-radius: 9999px;
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+      border: 2px solid rgba(255, 255, 255, 0.9);
+    }
+
+    @keyframes dash-pulse {
+      0% { stroke-dashoffset: 24; }
+      100% { stroke-dashoffset: 0; }
+    }
+
+    @keyframes glow-float {
+      0%, 100% { transform: translateY(0px); filter: drop-shadow(0 8px 20px rgba(37, 99, 235, 0.15)); }
+      50% { transform: translateY(-6px); filter: drop-shadow(0 14px 28px rgba(37, 99, 235, 0.28)); }
+    }
+
+    .animate-glow-float {
+      animation: glow-float 4s ease-in-out infinite;
+    }
+
+    .animated-dash-arrow path:first-child {
+      stroke-dasharray: 4 4;
+      animation: dash-pulse 1.5s linear infinite;
+    }
+
+    /* Active selection cards highlight requested by user */
+    .service-card.active, .object-card.active {
+      border: 2.5px solid #2563eb !important;
+      background-color: #eff6ff !important;
+      box-shadow: 0 8px 25px -4px rgba(37, 99, 235, 0.3), inset 0 0 12px rgba(37, 99, 235, 0.06) !important;
+      transform: translateY(-3px) scale(1.02);
+      position: relative;
+    }
+
+    .service-card.active::after, .object-card.active::after {
+      content: '✓';
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 22px;
+      height: 22px;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #ffffff;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 8px rgba(37, 99, 235, 0.4);
+      z-index: 10;
     }
   </style>
 </head>
@@ -142,7 +346,7 @@
     <div class="absolute w-[400px] h-[400px] rounded-full bg-blue-400/5 -top-12 -left-20 pointer-events-none"></div>
     <div class="absolute w-[300px] h-[300px] rounded-full bg-orange-400/5 bottom-10 right-1/3 pointer-events-none"></div>
 
-    <div class="max-w-[1024px] mx-auto px-4 md:px-8 w-full relative z-10">
+    <div class="max-w-[1440px] mx-auto px-4 md:px-8 w-full relative z-10">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         
         <!-- Left Column: Content -->
@@ -165,7 +369,7 @@
               Leistungen entdecken
             </a>
             
-            <button id="play-video-btn" class="flex items-center space-x-2.5 text-slate-800 hover:text-blue-600 font-bold transition-all group focus:outline-none">
+            <button id="play-video-btn" onclick="openVideoModal()" class="flex items-center space-x-2.5 text-slate-800 hover:text-blue-600 font-bold transition-all group focus:outline-none cursor-pointer">
               <span class="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-md border border-slate-100 group-hover:scale-105 transition-transform duration-200">
                 <!-- Play Icon -->
                 <svg class="w-4.5 h-4.5 text-blue-600 fill-current ml-0.5" viewBox="0 0 24 24">
@@ -289,7 +493,7 @@
 
         <div class="lg:col-span-4 flex flex-col items-center">
           <div class="relative w-full max-w-[420px] lg:max-w-none h-[480px] md:h-[540px] lg:h-[654px] rounded-3xl overflow-hidden shadow-2xl border border-slate-100/50">
-            <img id="service-slider-img" src="warmeschutz.jpg" class="w-full h-full object-cover transition-all duration-500" alt="Dämmung Service">
+            <img id="service-slider-img" src="feature_ergebnisse.jpg" class="w-full h-full object-cover transition-all duration-500" alt="Dämmung Service">
             <div class="absolute inset-0 bg-gradient-to-t from-slate-950/20 via-transparent to-transparent z-10"></div>
             <div class="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-lg border border-slate-100/50 z-20 flex flex-col gap-1.5 text-left">
               <div class="flex justify-between items-start gap-2">
@@ -314,11 +518,15 @@
   </section>
 
   <!-- Services Expertise Cards Section -->
-  <section id="expertise-services" class="py-24 bg-slate-50 text-left">
-    <div class="max-w-[1440px] mx-auto px-4 md:px-8">
+  <section id="expertise-services" class="py-24 bg-gradient-to-b from-slate-50 via-blue-50/20 to-slate-50 text-left relative overflow-hidden">
+    <!-- Subtle Background Glow Orbs for Glassmorphism Reflection -->
+    <div class="absolute w-[500px] h-[500px] rounded-full bg-blue-400/10 -top-24 -left-24 blur-3xl pointer-events-none"></div>
+    <div class="absolute w-[450px] h-[450px] rounded-full bg-indigo-400/10 bottom-0 right-0 blur-3xl pointer-events-none"></div>
+
+    <div class="max-w-[1440px] mx-auto px-4 md:px-8 relative z-10">
       <div class="flex items-end justify-between gap-6 mb-12">
         <div>
-          <span data-i18n="sliderTagline" class="text-xs font-bold text-slate-400 uppercase tracking-[0.22em] block mb-4">UNSERE LEISTUNGEN &amp; EXPERTISE</span>
+          <span data-i18n="sliderTagline" class="inline-flex items-center text-xs font-bold text-blue-600 uppercase tracking-widest bg-blue-100/60 px-3 py-1.5 rounded-full mb-6 border border-blue-200/50 backdrop-blur-sm">UNSERE LEISTUNGEN &amp; EXPERTISE</span>
           <h2 data-i18n="sliderHeading" class="text-4xl md:text-5xl font-normal tracking-tight text-slate-900 leading-[1.05] max-w-3xl">
             Professionelle Dämmung für<br><span class="text-blue-600">Gewerbe, Industrie &amp; Privat</span>
           </h2>
@@ -326,63 +534,68 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <article class="bg-blue-50/70 rounded-2xl p-8 md:p-10 min-h-[220px] flex items-start gap-7 hover:bg-blue-100/70 transition-colors">
-          <div class="w-16 h-16 rounded-2xl bg-white flex items-center justify-center text-blue-600 shrink-0 shadow-sm">
-            <svg class="w-9 h-9" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 3v18M5 7h14M5 17h14M7 7v10m10-10v10M4 3h16M4 21h16" />
+        <!-- Wärmeschutz Card -->
+        <article onclick="openServiceDetailModal('warm')" class="glass-card rounded-3xl p-8 md:p-10 min-h-[220px] flex items-start gap-6 cursor-pointer group">
+          <div class="w-14 h-14 rounded-full glass-icon-box flex items-center justify-center text-blue-600 shrink-0 group-hover:scale-110 transition-transform duration-300">
+            <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9.879z" />
             </svg>
           </div>
           <div>
             <h3 data-i18n="serviceWarmTitle" class="text-xl font-extrabold text-slate-900">Wärmeschutz</h3>
-            <p data-i18n="serviceWarmDesc" class="mt-3 text-sm text-slate-500 leading-relaxed max-w-lg">Dämmung von Heizungs- und Warmwasserleitungen. Minimiert Energieverluste, spart Heizkosten und senkt CO2-Emissionen spürbar.</p>
-            <a href="#contact" class="mt-4 inline-flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors">
-              <span data-i18n="sliderCardCta">Mehr erfahren</span><span class="w-5 h-5 rounded-full bg-blue-600 text-white inline-flex items-center justify-center text-xs">›</span>
-            </a>
+            <p data-i18n="serviceWarmDesc" class="mt-3 text-sm text-slate-600 leading-relaxed max-w-lg">Dämmung von Heizungs- und Warmwasserleitungen. Minimiert Energieverluste, spart Heizkosten und senkt CO2-Emissionen spürbar.</p>
+            <button onclick="event.stopPropagation(); openServiceDetailModal('warm')" class="mt-5 inline-flex items-center gap-2 text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors">
+              <span data-i18n="sliderCardCta">Mehr erfahren</span><span class="w-5 h-5 rounded-full bg-blue-600 text-white inline-flex items-center justify-center text-xs shadow-md group-hover:translate-x-0.5 transition-transform">›</span>
+            </button>
           </div>
         </article>
 
-        <article class="bg-blue-50/70 rounded-2xl p-8 md:p-10 min-h-[220px] flex items-start gap-7 hover:bg-blue-100/70 transition-colors">
-          <div class="w-16 h-16 rounded-2xl bg-white flex items-center justify-center text-blue-600 shrink-0 shadow-sm">
-            <svg class="w-9 h-9" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 12h16M7 5v14m10-14v14M5 5h14M5 19h14" />
+        <!-- Kälteschutz Card -->
+        <article onclick="openServiceDetailModal('kalt')" class="glass-card rounded-3xl p-8 md:p-10 min-h-[220px] flex items-start gap-6 cursor-pointer group">
+          <div class="w-14 h-14 rounded-full glass-icon-box flex items-center justify-center text-blue-600 shrink-0 group-hover:scale-110 transition-transform duration-300">
+            <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07L19.07 4.93M12 6L9 9M12 6l3 3M12 18l-3-3M12 18l3-3M6 12l3-3M6 12l3 3M18 12l-3-3M18 12l-3 3" />
             </svg>
           </div>
           <div>
             <h3 data-i18n="serviceKaltTitle" class="text-xl font-extrabold text-slate-900">Kälteschutz</h3>
-            <p data-i18n="serviceKaltDesc" class="mt-3 text-sm text-slate-500 leading-relaxed max-w-lg">Isolierung von Kälte- und Klimaleitungen. Verhindert zuverlässig Tauwasserbildung, Korrosion und unkontrollierten Kälteverlust.</p>
-            <a href="#contact" class="mt-4 inline-flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors">
-              <span data-i18n="sliderCardCta">Mehr erfahren</span><span class="w-5 h-5 rounded-full bg-blue-600 text-white inline-flex items-center justify-center text-xs">›</span>
-            </a>
+            <p data-i18n="serviceKaltDesc" class="mt-3 text-sm text-slate-600 leading-relaxed max-w-lg">Isolierung von Kälte- und Klimaleitungen. Verhindert zuverlässig Tauwasserbildung, Korrosion und unkontrollierten Kälteverlust.</p>
+            <button onclick="event.stopPropagation(); openServiceDetailModal('kalt')" class="mt-5 inline-flex items-center gap-2 text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors">
+              <span data-i18n="sliderCardCta">Mehr erfahren</span><span class="w-5 h-5 rounded-full bg-blue-600 text-white inline-flex items-center justify-center text-xs shadow-md group-hover:translate-x-0.5 transition-transform">›</span>
+            </button>
           </div>
         </article>
 
-        <article class="bg-blue-50/70 rounded-2xl p-8 md:p-10 min-h-[220px] flex items-start gap-7 hover:bg-blue-100/70 transition-colors">
-          <div class="w-16 h-16 rounded-2xl bg-white flex items-center justify-center text-blue-600 shrink-0 shadow-sm">
-            <svg class="w-9 h-9" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 9h16M4 12h16M4 15h16M7 5v14m10-14v14" />
+        <!-- Schallschutz Card -->
+        <article onclick="openServiceDetailModal('schall')" class="glass-card rounded-3xl p-8 md:p-10 min-h-[220px] flex items-start gap-6 cursor-pointer group">
+          <div class="w-14 h-14 rounded-full glass-icon-box flex items-center justify-center text-blue-600 shrink-0 group-hover:scale-110 transition-transform duration-300">
+            <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
             </svg>
           </div>
           <div>
             <h3 data-i18n="serviceSchallTitle" class="text-xl font-extrabold text-slate-900">Schallschutz</h3>
-            <p data-i18n="serviceSchallDesc" class="mt-3 text-sm text-slate-500 leading-relaxed max-w-lg">Schallisolierung von Rohrleitungen, Abwasserrohren und Lüftungskanälen zur Minderung von Fließ- und Luftschallgeräuschen.</p>
-            <a href="#contact" class="mt-4 inline-flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors">
-              <span data-i18n="sliderCardCta">Mehr erfahren</span><span class="w-5 h-5 rounded-full bg-blue-600 text-white inline-flex items-center justify-center text-xs">›</span>
-            </a>
+            <p data-i18n="serviceSchallDesc" class="mt-3 text-sm text-slate-600 leading-relaxed max-w-lg">Schallisolierung von Rohrleitungen, Abwasserrohren und Lüftungskanälen zur Minderung von Fließ- und Luftschallgeräuschen.</p>
+            <button onclick="event.stopPropagation(); openServiceDetailModal('schall')" class="mt-5 inline-flex items-center gap-2 text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors">
+              <span data-i18n="sliderCardCta">Mehr erfahren</span><span class="w-5 h-5 rounded-full bg-blue-600 text-white inline-flex items-center justify-center text-xs shadow-md group-hover:translate-x-0.5 transition-transform">›</span>
+            </button>
           </div>
         </article>
 
-        <article class="bg-blue-50/70 rounded-2xl p-8 md:p-10 min-h-[220px] flex items-start gap-7 hover:bg-blue-100/70 transition-colors">
-          <div class="w-16 h-16 rounded-2xl bg-white flex items-center justify-center text-blue-600 shrink-0 shadow-sm">
-            <svg class="w-9 h-9" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 3l7 4v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V7l7-4zM9 12l2 2 4-4" />
+        <!-- Brandschutz Card -->
+        <article onclick="openServiceDetailModal('brand')" class="glass-card rounded-3xl p-8 md:p-10 min-h-[220px] flex items-start gap-6 cursor-pointer group">
+          <div class="w-14 h-14 rounded-full glass-icon-box flex items-center justify-center text-blue-600 shrink-0 group-hover:scale-110 transition-transform duration-300">
+            <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
             </svg>
           </div>
           <div>
             <h3 data-i18n="serviceBrandTitle" class="text-xl font-extrabold text-slate-900">Brandschutz</h3>
-            <p data-i18n="serviceBrandDesc" class="mt-3 text-sm text-slate-500 leading-relaxed max-w-lg">Zertifizierte Brandabschottungen und feuerwiderstandsfähige Rohrdurchführungen zur Einhaltung gesetzlicher Sicherheitsstandards.</p>
-            <a href="#contact" class="mt-4 inline-flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors">
-              <span data-i18n="sliderCardCta">Mehr erfahren</span><span class="w-5 h-5 rounded-full bg-blue-600 text-white inline-flex items-center justify-center text-xs">›</span>
-            </a>
+            <p data-i18n="serviceBrandDesc" class="mt-3 text-sm text-slate-600 leading-relaxed max-w-lg">Zertifizierte Brandabschottungen und feuerwiderstandsfähige Rohrdurchführungen zur Einhaltung gesetzlicher Sicherheitsstandards.</p>
+            <button onclick="event.stopPropagation(); openServiceDetailModal('brand')" class="mt-5 inline-flex items-center gap-2 text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors">
+              <span data-i18n="sliderCardCta">Mehr erfahren</span><span class="w-5 h-5 rounded-full bg-blue-600 text-white inline-flex items-center justify-center text-xs shadow-md group-hover:translate-x-0.5 transition-transform">›</span>
+            </button>
           </div>
         </article>
       </div>
@@ -408,100 +621,106 @@
         </p>
 
         <!-- Process Grid -->
-        <div class="mt-16 flex flex-col lg:flex-row items-center lg:items-start justify-between gap-8 lg:gap-4 max-w-6xl mx-auto">
+        <div class="mt-16 flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-3 max-w-5xl mx-auto">
           
           <!-- Step 1 -->
-          <div class="flex-1 flex flex-col items-center max-w-[200px] text-center">
-            <div class="w-20 h-20 rounded-full bg-white text-blue-600 flex items-center justify-center shadow-md border border-slate-100 hover:scale-105 transition-transform duration-300">
-              <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+          <div class="flex-1 flex flex-col items-center max-w-[200px] text-center animate-glow-float" style="animation-delay: 0s;">
+            <div class="w-20 h-20 rounded-full glass-icon-circle text-blue-600 flex items-center justify-center cursor-pointer">
+              <span class="glass-badge-number">1</span>
+              <svg class="w-8 h-8 glass-step-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
               </svg>
             </div>
-            <h4 data-i18n="step1Title" class="text-lg font-bold text-slate-900 mt-6">Anfrage</h4>
+            <h4 data-i18n="step1Title" class="text-lg font-bold text-slate-900 mt-6 whitespace-nowrap">Anfrage</h4>
             <p data-i18n="step1Desc" class="text-slate-500 text-xs mt-2.5 leading-relaxed">
               Unverbindlich online anfragen oder anrufen in unter 60 Sekunden.
             </p>
           </div>
 
           <!-- Arrow 1 -->
-          <div class="hidden lg:flex items-center justify-center text-slate-300 w-16 shrink-0 mt-6 select-none">
+          <div class="hidden lg:flex items-center justify-center text-blue-400 w-16 shrink-0 mt-6 select-none animated-dash-arrow">
             <svg class="w-12 h-8" viewBox="0 0 48 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 14C12 6 24 6 36 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="3 3"/>
+              <path d="M4 14C12 6 24 6 36 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
               <path d="M32 12.5L36.5 12L35.5 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </div>
 
           <!-- Step 2 -->
-          <div class="flex-1 flex flex-col items-center max-w-[200px] text-center">
-            <div class="w-20 h-20 rounded-full bg-white text-blue-600 flex items-center justify-center shadow-md border border-slate-100 hover:scale-105 transition-transform duration-300">
-              <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          <div class="flex-1 flex flex-col items-center max-w-[200px] text-center animate-glow-float" style="animation-delay: 0.8s;">
+            <div class="w-20 h-20 rounded-full glass-icon-circle text-blue-600 flex items-center justify-center cursor-pointer">
+              <span class="glass-badge-number">2</span>
+              <svg class="w-8 h-8 glass-step-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
-            <h4 data-i18n="step2Title" class="text-lg font-bold text-slate-900 mt-6">Vor-Ort-Termin</h4>
+            <h4 data-i18n="step2Title" class="text-lg font-bold text-slate-900 mt-6 whitespace-nowrap">Besichtigung</h4>
             <p data-i18n="step2Desc" class="text-slate-500 text-xs mt-2.5 leading-relaxed">
               Kostenlose Besichtigung, Beratung und exaktes Aufmaß vor Ort.
             </p>
           </div>
 
           <!-- Arrow 2 -->
-          <div class="hidden lg:flex items-center justify-center text-slate-300 w-16 shrink-0 mt-6 select-none">
+          <div class="hidden lg:flex items-center justify-center text-blue-400 w-16 shrink-0 mt-6 select-none animated-dash-arrow">
             <svg class="w-12 h-8" viewBox="0 0 48 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 14C12 6 24 6 36 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="3 3"/>
+              <path d="M4 14C12 6 24 6 36 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
               <path d="M32 12.5L36.5 12L35.5 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </div>
 
           <!-- Step 3 -->
-          <div class="flex-1 flex flex-col items-center max-w-[200px] text-center">
-            <div class="w-20 h-20 rounded-full bg-white text-blue-600 flex items-center justify-center shadow-md border border-slate-100 hover:scale-105 transition-transform duration-300">
-              <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          <div class="flex-1 flex flex-col items-center max-w-[200px] text-center animate-glow-float" style="animation-delay: 1.6s;">
+            <div class="w-20 h-20 rounded-full glass-icon-circle text-blue-600 flex items-center justify-center cursor-pointer">
+              <span class="glass-badge-number">3</span>
+              <svg class="w-8 h-8 glass-step-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m-6 4h6m-6 4h4m6 2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2z" />
               </svg>
             </div>
-            <h4 data-i18n="step3Title" class="text-lg font-bold text-slate-900 mt-6">Angebot</h4>
+            <h4 data-i18n="step3Title" class="text-lg font-bold text-slate-900 mt-6 whitespace-nowrap">Angebot</h4>
             <p data-i18n="step3Desc" class="text-slate-500 text-xs mt-2.5 leading-relaxed">
               Transparentes Festpreisangebot und Dämmmaterialauswahl.
             </p>
           </div>
 
           <!-- Arrow 3 -->
-          <div class="hidden lg:flex items-center justify-center text-slate-300 w-16 shrink-0 mt-6 select-none">
+          <div class="hidden lg:flex items-center justify-center text-blue-400 w-16 shrink-0 mt-6 select-none animated-dash-arrow">
             <svg class="w-12 h-8" viewBox="0 0 48 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 14C12 6 24 6 36 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="3 3"/>
+              <path d="M4 14C12 6 24 6 36 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
               <path d="M32 12.5L36.5 12L35.5 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </div>
 
           <!-- Step 4 -->
-          <div class="flex-1 flex flex-col items-center max-w-[200px] text-center">
-            <div class="w-20 h-20 rounded-full bg-white text-blue-600 flex items-center justify-center shadow-md border border-slate-100 hover:scale-105 transition-transform duration-300">
-              <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          <div class="flex-1 flex flex-col items-center max-w-[200px] text-center animate-glow-float" style="animation-delay: 2.4s;">
+            <div class="w-20 h-20 rounded-full glass-icon-circle text-blue-600 flex items-center justify-center cursor-pointer">
+              <span class="glass-badge-number">4</span>
+              <svg class="w-8 h-8 glass-step-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />
               </svg>
             </div>
-            <h4 data-i18n="step4Title" class="text-lg font-bold text-slate-900 mt-6">Durchführung</h4>
+            <h4 data-i18n="step4Title" class="text-lg font-bold text-slate-900 mt-6 whitespace-nowrap">Durchführung</h4>
             <p data-i18n="step4Desc" class="text-slate-500 text-xs mt-2.5 leading-relaxed">
               Präzise Montage der Dämmmaterialien und Blechummantelungen.
             </p>
           </div>
 
           <!-- Arrow 4 -->
-          <div class="hidden lg:flex items-center justify-center text-slate-300 w-16 shrink-0 mt-6 select-none">
+          <div class="hidden lg:flex items-center justify-center text-blue-400 w-16 shrink-0 mt-6 select-none animated-dash-arrow">
             <svg class="w-12 h-8" viewBox="0 0 48 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 14C12 6 24 6 36 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="3 3"/>
+              <path d="M4 14C12 6 24 6 36 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
               <path d="M32 12.5L36.5 12L35.5 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </div>
 
           <!-- Step 5 -->
-          <div class="flex-1 flex flex-col items-center max-w-[200px] text-center">
-            <div class="w-20 h-20 rounded-full bg-white text-blue-600 flex items-center justify-center shadow-md border border-slate-100 hover:scale-105 transition-transform duration-300">
-              <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <div class="flex-1 flex flex-col items-center max-w-[200px] text-center animate-glow-float" style="animation-delay: 3.2s;">
+            <div class="w-20 h-20 rounded-full glass-icon-circle text-blue-600 flex items-center justify-center cursor-pointer">
+              <span class="glass-badge-number">5</span>
+              <svg class="w-8 h-8 glass-step-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
               </svg>
             </div>
-            <h4 data-i18n="step5Title" class="text-lg font-bold text-slate-900 mt-6">Endergebnis</h4>
+            <h4 data-i18n="step5Title" class="text-lg font-bold text-slate-900 mt-6 whitespace-nowrap">Endergebnis</h4>
             <p data-i18n="step5Desc" class="text-slate-500 text-xs mt-2.5 leading-relaxed">
               Gemeinsame Abnahme und 100% zertifizierte Energieeffizienz.
             </p>
@@ -546,58 +765,64 @@
                 <h4 data-i18n="formTitle1" class="text-xl font-bold text-slate-900 mb-6 font-semibold">Wählen Sie die gewünschte Dämmungsart</h4>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                   
-                  <div onclick="selectService('Heizungsrohrdämmung')" id="service-opt-1" class="service-card bg-slate-50 border border-slate-100 rounded-2xl p-4 flex flex-col items-center justify-center cursor-pointer hover:border-blue-300 hover:bg-blue-50/20 transition-all text-center">
-                    <div class="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center mb-3">
-                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
+                  <!-- Heizungsrohrdämmung -->
+                  <div onclick="selectService('Heizungsrohrdämmung')" id="service-opt-1" class="service-card bg-white border border-slate-200/80 rounded-2xl p-5 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:shadow-lg hover:-translate-y-0.5 transition-all text-center group">
+                    <div class="w-12 h-12 rounded-2xl bg-orange-50 border border-orange-200/60 text-orange-600 flex items-center justify-center mb-3.5 group-hover:scale-110 transition-transform">
+                      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
                       </svg>
                     </div>
-                    <span class="text-xs font-bold text-slate-700 leading-tight">Heizungsrohrdämmung</span>
+                    <span class="text-xs font-bold text-slate-800 leading-snug">Heizungsrohrdämmung</span>
                   </div>
 
-                  <div onclick="selectService('Kälteleitungsisolierung')" id="service-opt-2" class="service-card bg-slate-50 border border-slate-100 rounded-2xl p-4 flex flex-col items-center justify-center cursor-pointer hover:border-blue-300 hover:bg-blue-50/20 transition-all text-center">
-                    <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center mb-3">
-                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 3v18M3 12h18m-3-3l-3 3 3 3m-12-6l3 3-3 3M9 3l3 3-3 3m6-6l-3 3 3 3" />
+                  <!-- Kälteleitungsisolierung -->
+                  <div onclick="selectService('Kälteleitungsisolierung')" id="service-opt-2" class="service-card bg-white border border-slate-200/80 rounded-2xl p-5 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:shadow-lg hover:-translate-y-0.5 transition-all text-center group">
+                    <div class="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200/60 text-blue-600 flex items-center justify-center mb-3.5 group-hover:scale-110 transition-transform">
+                      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07L19.07 4.93M12 6L9 9M12 6l3 3M12 18l-3-3M12 18l3-3M6 12l3-3M6 12l3 3M18 12l-3-3M18 12l-3 3" />
                       </svg>
                     </div>
-                    <span class="text-xs font-bold text-slate-700 leading-tight">Kälteleitungsisolierung</span>
+                    <span class="text-xs font-bold text-slate-800 leading-snug">Kälteleitungsisolierung</span>
                   </div>
 
-                  <div onclick="selectService('Blechummantelung')" id="service-opt-3" class="service-card bg-slate-50 border border-slate-100 rounded-2xl p-4 flex flex-col items-center justify-center cursor-pointer hover:border-blue-300 hover:bg-blue-50/20 transition-all text-center">
-                    <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center mb-3">
-                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  <!-- Blechummantelung -->
+                  <div onclick="selectService('Blechummantelung')" id="service-opt-3" class="service-card bg-white border border-slate-200/80 rounded-2xl p-5 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:shadow-lg hover:-translate-y-0.5 transition-all text-center group">
+                    <div class="w-12 h-12 rounded-2xl bg-slate-100 border border-slate-200 text-slate-700 flex items-center justify-center mb-3.5 group-hover:scale-110 transition-transform">
+                      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                       </svg>
                     </div>
-                    <span class="text-xs font-bold text-slate-700 leading-tight">Blechummantelung</span>
+                    <span class="text-xs font-bold text-slate-800 leading-snug">Blechummantelung</span>
                   </div>
 
-                  <div onclick="selectService('Armaturendämmung')" id="service-opt-4" class="service-card bg-slate-50 border border-slate-100 rounded-2xl p-4 flex flex-col items-center justify-center cursor-pointer hover:border-blue-300 hover:bg-blue-50/20 transition-all text-center">
-                    <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center mb-3">
-                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <!-- Armaturendämmung -->
+                  <div onclick="selectService('Armaturendämmung')" id="service-opt-4" class="service-card bg-white border border-slate-200/80 rounded-2xl p-5 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:shadow-lg hover:-translate-y-0.5 transition-all text-center group">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200/60 text-amber-600 flex items-center justify-center mb-3.5 group-hover:scale-110 transition-transform">
+                      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                       </svg>
                     </div>
-                    <span class="text-xs font-bold text-slate-700 leading-tight">Armaturendämmung</span>
+                    <span class="text-xs font-bold text-slate-800 leading-snug">Armaturendämmung</span>
                   </div>
 
-                  <div onclick="selectService('Brandschutz-Abschottung')" id="service-opt-5" class="service-card bg-slate-50 border border-slate-100 rounded-2xl p-4 flex flex-col items-center justify-center cursor-pointer hover:border-blue-300 hover:bg-blue-50/20 transition-all text-center">
-                    <div class="w-10 h-10 rounded-xl bg-red-100 text-red-600 flex items-center justify-center mb-3">
-                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  <!-- Brandschutz-Abschottung -->
+                  <div onclick="selectService('Brandschutz-Abschottung')" id="service-opt-5" class="service-card bg-white border border-slate-200/80 rounded-2xl p-5 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:shadow-lg hover:-translate-y-0.5 transition-all text-center group">
+                    <div class="w-12 h-12 rounded-2xl bg-red-50 border border-red-200/60 text-red-600 flex items-center justify-center mb-3.5 group-hover:scale-110 transition-transform">
+                      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                       </svg>
                     </div>
-                    <span class="text-xs font-bold text-slate-700 leading-tight">Brandschutz-Abschottung</span>
+                    <span class="text-xs font-bold text-slate-800 leading-snug">Brandschutz-Abschottung</span>
                   </div>
 
-                  <div onclick="selectService('Lüftungskanal-Dämmung')" id="service-opt-6" class="service-card bg-slate-50 border border-slate-100 rounded-2xl p-4 flex flex-col items-center justify-center cursor-pointer hover:border-blue-300 hover:bg-blue-50/20 transition-all text-center">
-                    <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center mb-3">
-                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  <!-- Lüftungskanal-Dämmung -->
+                  <div onclick="selectService('Lüftungskanal-Dämmung')" id="service-opt-6" class="service-card bg-white border border-slate-200/80 rounded-2xl p-5 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:shadow-lg hover:-translate-y-0.5 transition-all text-center group">
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200/60 text-emerald-600 flex items-center justify-center mb-3.5 group-hover:scale-110 transition-transform">
+                      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                       </svg>
                     </div>
-                    <span class="text-xs font-bold text-slate-700 leading-tight">Lüftungskanal-Dämmung</span>
+                    <span class="text-xs font-bold text-slate-800 leading-snug">Lüftungskanal-Dämmung</span>
                   </div>
 
                 </div>
@@ -743,12 +968,12 @@
           </div>
 
           <!-- Right: Blue Live Preview Card (4 columns) -->
-          <div class="lg:col-span-4 bg-blue-600 text-white p-6 md:p-8 flex flex-col justify-between relative min-h-[400px]">
+          <div class="lg:col-span-4 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-900 text-white p-6 md:p-8 flex flex-col justify-between relative min-h-[400px]">
             <div>
               <span data-i18n="liveOverview" class="text-xs uppercase font-semibold tracking-wider text-blue-200">Ihre Anfrage</span>
-              <div class="flex items-center justify-between border-b border-blue-500/30 pb-4 mt-1 mb-6">
-                <h4 data-i18n="liveOverviewSub" class="text-2xl font-bold">Kostenlose Offerte</h4>
-                <span class="bg-blue-500/50 text-[10px] font-bold px-2 py-0.5 rounded-full select-none">Live Overview</span>
+              <div class="flex items-center justify-between border-b border-white/20 pb-4 mt-1 mb-6">
+                <h4 data-i18n="liveOverviewSub" class="text-2xl font-bold glass-text">Kostenlose Offerte</h4>
+                <span class="bg-white/20 backdrop-blur-md text-[10px] font-bold px-2.5 py-1 rounded-full select-none border border-white/30 shadow-inner">Live Overview</span>
               </div>
 
               <div class="space-y-4 text-sm font-semibold">
@@ -842,7 +1067,7 @@
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
           </svg>
-          <span data-i18n="btnAddReview">+ Eigene Bewertung abgeben</span>
+          <span data-i18n="btnAddReview">Eigene Bewertung abgeben</span>
         </button>
       </div>
 
@@ -1284,17 +1509,17 @@
   </section>
 
   <!-- CTA Banner Section -->
-  <section class="relative bg-slate-950 text-white overflow-visible mt-32 py-16 md:py-24 text-center lg:text-left">
-    <!-- Worker sticking out -->
-    <img src="worker.png" alt="Prekadini ThermoTech Dämmung Experte" class="absolute bottom-0 left-4 lg:left-12 xl:left-24 h-[135%] w-auto max-w-[280px] md:max-w-[360px] lg:max-w-[420px] object-contain z-10 hidden lg:block pointer-events-none">
-
-    <div class="max-w-[1440px] mx-auto px-4 md:px-8 relative z-20">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-        <!-- Spacer for the worker image on large screens -->
-        <div class="hidden lg:block lg:col-span-5"></div>
+  <section class="relative bg-slate-950 text-white overflow-visible mt-28 pt-10 pb-0 md:pt-14 md:pb-0">
+    <div class="max-w-[1200px] mx-auto px-4 md:px-8 relative z-20">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
         
-        <!-- Content -->
-        <div class="lg:col-span-7 space-y-6">
+        <!-- Left: Worker image popping out into white section above and touching section bottom -->
+        <div class="hidden lg:flex lg:col-span-4 justify-end relative h-full min-h-[260px]">
+          <img src="worker.png" alt="Prekadini ThermoTech Dämmung Experte" class="absolute bottom-0 right-0 h-[145%] xl:h-[155%] w-auto max-w-[340px] xl:max-w-[380px] object-contain z-20 pointer-events-none">
+        </div>
+
+        <!-- Right: Text Content (text-left) -->
+        <div class="lg:col-span-8 space-y-5 text-left pb-10 md:pb-14">
           <span data-i18n="ctaTagline" class="text-xs font-bold text-blue-400 uppercase tracking-[0.2em] block">HEUTE ANFRAGEN!</span>
           
           <h2 data-i18n="ctaHeading" class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white leading-tight">
@@ -1305,20 +1530,21 @@
             Ein Anruf – Perfekte Dämmung garantiert ( +49 (0) 172 913 7112 )
           </p>
 
-          <!-- Buttons -->
-          <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
-            <a href="tel:+491729137112" class="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-6 rounded-xl transition-all shadow-md focus:outline-none text-sm">
+          <!-- Buttons left-aligned & close to each other -->
+          <div class="flex flex-wrap items-center justify-start gap-3 pt-2">
+            <a href="tel:+491729137112" class="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-6 rounded-xl transition-all shadow-md focus:outline-none text-sm whitespace-nowrap shrink-0">
               <svg class="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
               </svg>
-              <span data-i18n="ctaBtnCall">Jetzt anrufen!</span>
+              <span data-i18n="ctaBtnCall" class="whitespace-nowrap">Jetzt anrufen!</span>
             </a>
             
-            <a href="#about" class="inline-flex items-center space-x-2 border border-slate-700 hover:border-slate-500 bg-transparent text-white font-bold py-3.5 px-6 rounded-xl transition-all focus:outline-none text-sm">
-              <span data-i18n="ctaBtnOffer">Angebot anfordern</span>
+            <a href="#about" class="inline-flex items-center space-x-2 border border-slate-700 hover:border-slate-500 bg-transparent text-white font-bold py-3.5 px-6 rounded-xl transition-all focus:outline-none text-sm whitespace-nowrap shrink-0">
+              <span data-i18n="ctaBtnOffer" class="whitespace-nowrap">Angebot anfordern</span>
             </a>
           </div>
         </div>
+
       </div>
     </div>
   </section>
@@ -1332,7 +1558,7 @@
         
         <!-- Column 1: Brand & Socials -->
         <div class="space-y-6">
-          <img src="logo.png" alt="Prekadini ThermoTech" class="h-16 w-auto object-contain">
+          <img src="logo.png" alt="Prekadini ThermoTech" class="h-28 md:h-32 w-auto object-contain">
           <p data-i18n="footerDesc" class="text-xs text-slate-500 leading-relaxed font-semibold">
             Ihr zuverlässiger Partner für erstklassige Dämmtechnik in 85053 Ingolstadt.
           </p>
@@ -1468,19 +1694,73 @@
         Schließen
       </button>
     </div>
+  <!-- Service Details Modal (Popup) -->
+  <div id="service-detail-modal" class="fixed inset-0 z-[300] bg-slate-950/75 backdrop-blur-md items-center justify-center p-4" style="display: none;" onclick="if(event.target === this) closeServiceDetailModal()">
+    <div id="service-detail-modal-card" class="bg-white rounded-3xl max-w-2xl w-full p-6 md:p-8 relative shadow-2xl border border-slate-100 text-left max-h-[90vh] overflow-y-auto">
+      
+      <!-- Close Button -->
+      <button onclick="closeServiceDetailModal()" class="absolute top-5 right-5 w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 hover:text-slate-900 transition-all cursor-pointer" aria-label="Schließen">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      <!-- Modal Header (Icon + Category Badge) -->
+      <div class="flex items-center space-x-4 mb-6 pr-8">
+        <div id="service-modal-icon-container" class="w-14 h-14 rounded-2xl bg-blue-50 border border-dashed border-blue-200 flex items-center justify-center text-blue-600 shrink-0 shadow-sm">
+        </div>
+        <div>
+          <span id="service-modal-badge" class="inline-flex items-center text-[11px] font-bold text-blue-600 uppercase tracking-widest bg-blue-50 border border-blue-200/60 px-2.5 py-1 rounded-full mb-1">LEISTUNGS-DETAILS</span>
+          <h3 id="service-modal-title" class="text-2xl md:text-3xl font-extrabold text-slate-900 leading-tight">Wärmeschutz</h3>
+        </div>
+      </div>
+
+      <!-- Image preview inside modal -->
+      <div class="relative w-full h-48 md:h-56 rounded-2xl overflow-hidden mb-6 shadow-inner border border-slate-100">
+        <img id="service-modal-img" src="feature_ergebnisse.jpg" class="w-full h-full object-cover" alt="Service Detail">
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-transparent to-transparent"></div>
+        <div class="absolute bottom-3 left-4 text-white text-xs font-semibold tracking-wide" id="service-modal-img-caption">Prekadini ThermoTech Isoliersysteme</div>
+      </div>
+
+      <!-- Detailed Description -->
+      <div class="space-y-3 text-slate-600 text-sm md:text-base leading-relaxed">
+        <p id="service-modal-desc-main" class="font-semibold text-slate-800">
+        </p>
+        <p id="service-modal-desc-secondary" class="text-slate-500 text-xs md:text-sm">
+        </p>
+      </div>
+
+      <!-- Key Benefits Bullet Points -->
+      <div class="mt-6 pt-6 border-t border-slate-100">
+        <h4 id="service-modal-features-title" class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Vorteile &amp; Spezifikationen</h4>
+        <ul id="service-modal-features-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs md:text-sm font-semibold text-slate-800">
+        </ul>
+      </div>
+
+      <!-- Action Footer -->
+      <div class="mt-8 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <a id="service-modal-cta" href="#contact" onclick="closeServiceDetailModal()" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3.5 rounded-xl shadow-lg shadow-blue-600/25 transition-all text-center text-sm">
+          <span>Unverbindliches Angebot anfordern</span> &rarr;
+        </a>
+        <button onclick="closeServiceDetailModal()" class="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-5 py-3.5 rounded-xl transition-colors text-center text-sm cursor-pointer">
+          Schließen
+        </button>
+      </div>
+
+    </div>
   </div>
 
   <!-- Video Modal (Popup) -->
-  <div id="video-modal" class="fixed inset-0 z-[100] bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300">
-    <div id="video-modal-card" class="bg-black rounded-2xl max-w-4xl w-full aspect-video relative overflow-hidden shadow-2xl border border-white/10 transform scale-95 opacity-0 transition-all duration-300 ease-out">
+  <div id="video-modal" class="fixed inset-0 z-[300] bg-slate-950/80 backdrop-blur-sm items-center justify-center p-4" style="display: none;" onclick="if(event.target === this) closeVideoModal()">
+    <div id="video-modal-card" class="bg-black rounded-2xl max-w-4xl w-full aspect-video relative overflow-hidden shadow-2xl border border-white/10 text-left">
       <!-- Close Button -->
-      <button id="close-video-btn" class="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-black/40 hover:bg-black/60 border border-white/10 flex items-center justify-center text-white backdrop-blur transition-all" aria-label="Close video">
+      <button id="close-video-btn" onclick="closeVideoModal()" class="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-black/60 hover:bg-black/80 border border-white/20 flex items-center justify-center text-white backdrop-blur transition-all cursor-pointer" aria-label="Close video">
         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
       <!-- Video Player -->
-      <video id="modal-video-player" class="w-full h-full object-cover" controls preload="none">
+      <video id="modal-video-player" class="w-full h-full object-cover" controls preload="auto">
         <source src="work.mp4" type="video/mp4">
         Your browser does not support the video tag.
       </video>
