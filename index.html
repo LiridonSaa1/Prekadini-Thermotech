@@ -41,6 +41,14 @@
       color: transparent;
       -webkit-text-stroke: 1.5px #2563eb;
     }
+    .metric-outline {
+      color: transparent;
+      -webkit-text-stroke: 1.5px #0f172a;
+    }
+    .metric-plus {
+      color: #2563eb;
+      -webkit-text-stroke: 0;
+    }
     .hero-custom-bg {
       background-color: rgb(206, 222, 255);
       background-image: linear-gradient(rgb(206, 222, 255) 0%, rgb(206, 222, 255) 76%, rgb(221, 232, 255) 84%, rgb(238, 244, 255) 92%, rgb(255, 255, 255) 100%);
@@ -224,19 +232,19 @@
       </div>
 
       <!-- Bottom Metrics Row (exactly matching reference image positioning) -->
-      <div class="mt-16 md:mt-24 pt-8 border-t border-slate-200/60 flex flex-wrap gap-8 md:gap-16">
+      <div class="mt-16 md:mt-24 pt-8 flex flex-wrap justify-between gap-8 md:gap-16 max-w-4xl mx-auto w-full">
         <div>
-          <span data-i18n="metricProjectsVal" class="text-4xl md:text-5xl font-extrabold text-blue-600 tracking-tight block">500+</span>
-          <span data-i18n="metricProjectsLbl" class="text-xs md:text-sm text-slate-500 font-semibold uppercase tracking-wider mt-1 block">Erfolgreiche Projekte</span>
+          <span data-i18n="metricProjectsVal" class="text-4xl md:text-5xl font-extrabold tracking-tight block"><span class="metric-outline">2.5K</span><span class="metric-plus">+</span></span>
+          <span data-i18n="metricProjectsLbl" class="text-xs md:text-sm text-slate-500 font-semibold uppercase tracking-wider mt-1 block">Erfolgreiche Einsätze</span>
         </div>
         <div class="w-px h-12 bg-slate-200 hidden sm:block"></div>
         <div>
-          <span data-i18n="metricSatisfactionVal" class="text-4xl md:text-5xl font-extrabold text-blue-600 tracking-tight block">98%</span>
+          <span data-i18n="metricSatisfactionVal" class="text-4xl md:text-5xl font-extrabold tracking-tight block"><span class="metric-outline">98</span><span class="metric-plus">%</span></span>
           <span data-i18n="metricSatisfactionLbl" class="text-xs md:text-sm text-slate-500 font-semibold uppercase tracking-wider mt-1 block">Kundenzufriedenheit</span>
         </div>
         <div class="w-px h-12 bg-slate-200 hidden sm:block"></div>
         <div>
-          <span data-i18n="metricYearsVal" class="text-4xl md:text-5xl font-extrabold text-blue-600 tracking-tight block">10+</span>
+          <span data-i18n="metricYearsVal" class="text-4xl md:text-5xl font-extrabold tracking-tight block"><span class="metric-outline">23</span><span class="metric-plus">+</span></span>
           <span data-i18n="metricYearsLbl" class="text-xs md:text-sm text-slate-500 font-semibold uppercase tracking-wider mt-1 block">Jahre Erfahrung</span>
         </div>
       </div>
@@ -304,14 +312,6 @@
           <h2 data-i18n="sliderHeading" class="text-4xl md:text-5xl font-normal tracking-tight text-slate-900 leading-[1.05] max-w-3xl">
             Professionelle Dämmung für<br><span class="text-blue-600">Gewerbe, Industrie &amp; Privat</span>
           </h2>
-        </div>
-        <div class="hidden md:flex items-center gap-3 shrink-0">
-          <button type="button" aria-label="Vorherige Leistungen" class="w-12 h-12 rounded-2xl bg-white border border-slate-200 text-slate-700 flex items-center justify-center shadow-sm hover:border-blue-300 hover:text-blue-600 transition-colors">
-            <span class="text-2xl leading-none">‹</span>
-          </button>
-          <button type="button" aria-label="Nächste Leistungen" class="w-12 h-12 rounded-2xl bg-white border border-slate-200 text-slate-700 flex items-center justify-center shadow-sm hover:border-blue-300 hover:text-blue-600 transition-colors">
-            <span class="text-2xl leading-none">›</span>
-          </button>
         </div>
       </div>
 

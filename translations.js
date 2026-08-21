@@ -16,11 +16,11 @@ const translations = {
     ratingText: "Ratings 4.9/5",
     ratingSubtext: "Verifizierte Google Bewertungen",
     
-    metricProjectsVal: "<span class='text-hollow-blue'>500</span>+",
-    metricProjectsLbl: "Erfolgreiche Projekte",
-    metricSatisfactionVal: "<span class='text-hollow-blue'>98</span>%",
+    metricProjectsVal: "<span class='metric-outline'>2.5K</span><span class='metric-plus'>+</span>",
+    metricProjectsLbl: "Erfolgreiche Einsätze",
+    metricSatisfactionVal: "<span class='metric-outline'>98</span><span class='metric-plus'>%</span>",
     metricSatisfactionLbl: "Kundenzufriedenheit",
-    metricYearsVal: "<span class='text-hollow-blue'>10</span>+",
+    metricYearsVal: "<span class='metric-outline'>23</span><span class='metric-plus'>+</span>",
     metricYearsLbl: "Jahre Erfahrung",
     
     servicesTitle: "Unsere Leistungen",
@@ -209,11 +209,11 @@ const translations = {
     ratingText: "Vlerësimet 4.9/5",
     ratingSubtext: "Vlerësime të verifikuara në Google",
     
-    metricProjectsVal: "<span class='text-hollow-blue'>500</span>+",
-    metricProjectsLbl: "Projekte të Kryera",
-    metricSatisfactionVal: "<span class='text-hollow-blue'>98</span>%",
-    metricSatisfactionLbl: "Kënaqësi e Klientit",
-    metricYearsVal: "<span class='text-hollow-blue'>10</span>+",
+    metricProjectsVal: "<span class='metric-outline'>2.5K</span><span class='metric-plus'>+</span>",
+    metricProjectsLbl: "Ndërhyrje të suksesshme",
+    metricSatisfactionVal: "<span class='metric-outline'>98</span><span class='metric-plus'>%</span>",
+    metricSatisfactionLbl: "Kënaqësia e klientit",
+    metricYearsVal: "<span class='metric-outline'>23</span><span class='metric-plus'>+</span>",
     metricYearsLbl: "Vite Përvojë",
     
     servicesTitle: "Shërbimet Tona",
