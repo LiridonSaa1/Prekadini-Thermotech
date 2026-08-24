@@ -778,14 +778,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const answerText = isSq ? item.aSq : item.a;
 
       const faqItemHTML = `
-        <div onclick="toggleFaq('${item.id}')" class="group transition-all duration-300 rounded-3xl p-6 cursor-pointer select-none text-left ${isActive ? 'bg-blue-600 border border-blue-600 text-white shadow-lg' : 'bg-blue-50/40 hover:bg-blue-50/80 border border-slate-100/60 text-slate-800' }">
+        <div onclick="toggleFaq('${item.id}')" class="group glass-card rounded-3xl p-6 cursor-pointer select-none text-left transition-all duration-300 ${isActive ? '!bg-gradient-to-br !from-blue-600 !to-blue-700 !border-blue-500 !text-white shadow-xl shadow-blue-600/25' : 'text-slate-800' }">
           <div class="flex justify-between items-center gap-4">
-            <h3 class="font-bold text-sm md:text-base leading-snug">${questionText}</h3>
-            <span class="text-xl md:text-2xl font-normal shrink-0 ${isActive ? 'text-blue-100' : 'text-slate-400 group-hover:text-blue-600' }">
+            <h3 class="font-bold text-sm md:text-base leading-snug ${isActive ? 'text-white' : 'text-slate-800 group-hover:text-blue-600 transition-colors'}">${questionText}</h3>
+            <span class="text-xl md:text-2xl font-normal shrink-0 transition-transform ${isActive ? 'text-blue-100 rotate-180' : 'text-slate-400 group-hover:text-blue-600 group-hover:scale-110'}">
               ${isActive ? '—' : '+'}
             </span>
           </div>
-          ${isActive ? `<p class="text-xs md:text-sm text-blue-50/90 mt-4 leading-relaxed font-semibold transition-all duration-300">${answerText}</p>` : ''}
+          ${isActive ? `<p class="text-xs md:text-sm text-blue-50/95 mt-4 leading-relaxed font-medium border-t border-blue-500/40 pt-3 transition-all duration-300">${answerText}</p>` : ''}
         </div>
       `;
 

@@ -22,7 +22,13 @@ const contentTypes = {
 createServer(async (request, response) => {
   try {
     const requestPath = decodeURIComponent((request.url || "/").split("?")[0]);
-    const relativePath = requestPath === "/" ? "/index.html" : normalize(requestPath);
+    let relativePath;
+    if (requestPath === "/admin" || requestPath === "/admin/") {
+      relativePath = "/admin.html";
+    } else {
+      relativePath = requestPath === "/" ? "/index.html" : normalize(requestPath);
+    }
+    
     const filePath = resolve(root, `.${relativePath}`);
 
     if (!filePath.startsWith(root)) {
