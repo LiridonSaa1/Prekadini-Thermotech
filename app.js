@@ -1250,6 +1250,9 @@ window.openVideoModal = function() {
   const modal = document.getElementById("video-modal-custom");
   const video = document.getElementById("modal-video-player");
   if (modal) {
+    if (modal.parentElement !== document.body) {
+      document.body.appendChild(modal);
+    }
     modal.classList.add("active");
     modal.style.display = "flex";
     document.body.style.overflow = "hidden";
@@ -1430,12 +1433,19 @@ window.openServiceDetailModal = function(key) {
     });
   }
 
+  if (modal.parentElement !== document.body) {
+    document.body.appendChild(modal);
+  }
   modal.classList.add("active");
+  modal.style.display = "flex";
+  document.body.style.overflow = "hidden";
 };
 
 window.closeServiceDetailModal = function() {
   const modal = document.getElementById("service-detail-modal");
   if (modal) {
     modal.classList.remove("active");
+    modal.style.display = "none";
   }
+  document.body.style.overflow = "";
 };
