@@ -22,6 +22,42 @@
         }
       }
     }
+
+    function openVideoModal() {
+      var modal = document.getElementById("video-modal-custom");
+      var video = document.getElementById("modal-video-player");
+      if (modal) {
+        modal.classList.add("active");
+        modal.style.display = "flex";
+        document.body.style.overflow = "hidden";
+      }
+      if (video) {
+        try {
+          video.currentTime = 0;
+          var p = video.play();
+          if (p && typeof p.catch === "function") {
+            p.catch(function(err) { console.log("Video play info:", err); });
+          }
+        } catch (e) {
+          console.log("Video play exception:", e);
+        }
+      }
+    }
+    window.openVideoModal = openVideoModal;
+
+    function closeVideoModal() {
+      var modal = document.getElementById("video-modal-custom");
+      var video = document.getElementById("modal-video-player");
+      if (video) {
+        try { video.pause(); } catch(e) {}
+      }
+      if (modal) {
+        modal.classList.remove("active");
+        modal.style.display = "none";
+        document.body.style.overflow = "";
+      }
+    }
+    window.closeVideoModal = closeVideoModal;
   </script>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -320,7 +356,7 @@
 
       <!-- Center Logo -->
       <a href="#hero" class="hidden md:flex items-center justify-center py-1 flex-shrink-0">
-        <img src="logo.png" alt="Prekadini ThermoTech Logo" class="h-11 md:h-13 w-auto object-contain hover:scale-105 transition-transform">
+        <img src="logo.png" alt="Prekadini ThermoTech Logo" class="h-14 md:h-16 w-auto object-contain hover:scale-105 transition-transform">
       </a>
 
       <!-- Right Desktop Nav Links -->
@@ -335,7 +371,7 @@
 
         <!-- Center Logo Mobile -->
         <a href="#hero" class="flex items-center justify-center py-1">
-          <img src="logo.png" alt="Prekadini ThermoTech Logo" class="h-10 w-auto object-contain">
+          <img src="logo.png" alt="Prekadini ThermoTech Logo" class="h-12 w-auto object-contain">
         </a>
 
         <!-- Hamburger Button -->

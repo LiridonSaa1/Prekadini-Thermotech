@@ -1251,13 +1251,18 @@ window.openVideoModal = function() {
   const video = document.getElementById("modal-video-player");
   if (modal) {
     modal.classList.add("active");
+    modal.style.display = "flex";
     document.body.style.overflow = "hidden";
   }
   if (video) {
-    video.currentTime = 0;
-    const playPromise = video.play();
-    if (playPromise !== undefined) {
-      playPromise.catch(err => console.log("Video play error:", err));
+    try {
+      video.currentTime = 0;
+      const playPromise = video.play();
+      if (playPromise !== undefined && typeof playPromise.catch === "function") {
+        playPromise.catch(err => console.log("Video play info:", err));
+      }
+    } catch (e) {
+      console.log("Video play exception:", e);
     }
   }
 };
@@ -1266,10 +1271,11 @@ window.closeVideoModal = function() {
   const modal = document.getElementById("video-modal-custom");
   const video = document.getElementById("modal-video-player");
   if (video) {
-    video.pause();
+    try { video.pause(); } catch(e) {}
   }
   if (modal) {
     modal.classList.remove("active");
+    modal.style.display = "none";
     document.body.style.overflow = "";
   }
 };
