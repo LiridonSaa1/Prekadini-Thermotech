@@ -869,8 +869,13 @@ document.addEventListener("DOMContentLoaded", () => {
       websiteSettings = await SettingsService.fetchSettings();
       if (websiteSettings) {
         document.querySelectorAll('a[href^="tel:"]').forEach(el => {
-          el.href = `tel:${websiteSettings.phone.replace(/\s+/g, '')}`;
-          el.innerHTML = el.innerHTML.replace(/\+49.*/g, websiteSettings.phone).replace(/\(\+49.*\)/g, `(${websiteSettings.phone})`);
+          if (websiteSettings.phone) {
+            el.href = `tel:${websiteSettings.phone.replace(/\s+/g, '')}`;
+            const phoneSpan = el.querySelector('.phone-num-span');
+            if (phoneSpan) {
+              phoneSpan.textContent = websiteSettings.phone;
+            }
+          }
         });
         document.querySelectorAll('a[href*="wa.me"]').forEach(el => {
           el.href = `https://wa.me/${websiteSettings.whatsapp.replace(/\s+/g, '')}`;
