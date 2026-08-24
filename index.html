@@ -70,19 +70,44 @@
       left: 0 !important;
       width: 100vw !important;
       height: 100vh !important;
-      background-color: rgba(2, 6, 23, 0.75) !important;
-      backdrop-filter: blur(12px) !important;
-      -webkit-backdrop-filter: blur(12px) !important;
+      background-color: rgba(2, 6, 23, 0) !important;
+      backdrop-filter: blur(0px) !important;
+      -webkit-backdrop-filter: blur(0px) !important;
       z-index: 9999999 !important;
       display: none;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
       align-items: center !important;
       justify-content: center !important;
       padding: 16px !important;
       box-sizing: border-box !important;
-      transition: all 0.3s ease;
+      transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                  visibility 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                  backdrop-filter 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                  background-color 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
+
     #video-modal-custom.active, #service-detail-modal.active {
       display: flex !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      pointer-events: auto !important;
+      background-color: rgba(2, 6, 23, 0.75) !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+    }
+
+    #service-detail-modal-card, #video-modal-custom > div {
+      transform: scale(0.90) translateY(24px);
+      opacity: 0;
+      transition: transform 0.35s cubic-bezier(0.34, 1.45, 0.64, 1), opacity 0.3s ease;
+    }
+
+    #service-detail-modal.active #service-detail-modal-card,
+    #video-modal-custom.active > div {
+      transform: scale(1) translateY(0);
+      opacity: 1;
     }
     .contact-slider-pill {
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -717,7 +742,7 @@
             </div>
             <h4 data-i18n="step2Title" class="text-lg font-bold text-slate-900 mt-6 whitespace-nowrap">Besichtigung</h4>
             <p data-i18n="step2Desc" class="text-slate-500 text-xs mt-2.5 leading-relaxed">
-              Kostenlose Besichtigung, Beratung und exaktes Aufmaß vor Ort.
+              <span class="inline-block whitespace-nowrap">Kostenlose Besichtigung,</span><br><span class="inline-block whitespace-nowrap">Beratung und exaktes</span><br><span class="inline-block whitespace-nowrap">Aufmaß vor Ort.</span>
             </p>
           </div>
 

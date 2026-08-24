@@ -1273,8 +1273,10 @@ window.openVideoModal = function() {
     if (modal.parentElement !== document.body) {
       document.body.appendChild(modal);
     }
-    modal.classList.add("active");
     modal.style.display = "flex";
+    requestAnimationFrame(() => {
+      modal.classList.add("active");
+    });
   }
   if (video) {
     try {
@@ -1297,8 +1299,11 @@ window.closeVideoModal = function() {
   }
   if (modal) {
     modal.classList.remove("active");
-    modal.style.display = "none";
-    document.body.style.overflow = "";
+    setTimeout(() => {
+      if (!modal.classList.contains("active")) {
+        modal.style.display = "none";
+      }
+    }, 350);
   }
 };
 
@@ -1455,15 +1460,20 @@ window.openServiceDetailModal = function(key) {
   if (modal.parentElement !== document.body) {
     document.body.appendChild(modal);
   }
-  modal.classList.add("active");
   modal.style.display = "flex";
+  requestAnimationFrame(() => {
+    modal.classList.add("active");
+  });
 };
 
 window.closeServiceDetailModal = function() {
   const modal = document.getElementById("service-detail-modal");
   if (modal) {
     modal.classList.remove("active");
-    modal.style.display = "none";
+    setTimeout(() => {
+      if (!modal.classList.contains("active")) {
+        modal.style.display = "none";
+      }
+    }, 350);
   }
-  document.body.style.overflow = "";
 };
