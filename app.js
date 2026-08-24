@@ -138,11 +138,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Video Modal Player Control ---
   const playVideoBtn = document.getElementById("play-video-btn");
   const closeVideoBtn = document.getElementById("close-video-btn");
-  const videoModalEl = document.getElementById("video-modal");
+  const videoModalEl = document.getElementById("video-modal-custom");
 
-  if (playVideoBtn) playVideoBtn.addEventListener("click", () => window.openVideoModal());
   if (closeVideoBtn) closeVideoBtn.addEventListener("click", () => window.closeVideoModal());
-  
+
   if (videoModalEl) {
     videoModalEl.addEventListener("click", (e) => {
       if (e.target === videoModalEl) {
@@ -152,7 +151,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && videoModalEl && !videoModalEl.classList.contains("opacity-0")) {
+    if (e.key === "Escape" && videoModalEl && videoModalEl.classList.contains("active")) {
       window.closeVideoModal();
     }
   });
@@ -1252,10 +1251,14 @@ window.openVideoModal = function() {
   const video = document.getElementById("modal-video-player");
   if (modal) {
     modal.classList.add("active");
+    document.body.style.overflow = "hidden";
   }
   if (video) {
     video.currentTime = 0;
-    video.play().catch(err => console.log("Video play error:", err));
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(err => console.log("Video play error:", err));
+    }
   }
 };
 
@@ -1267,6 +1270,7 @@ window.closeVideoModal = function() {
   }
   if (modal) {
     modal.classList.remove("active");
+    document.body.style.overflow = "";
   }
 };
 

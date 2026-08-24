@@ -1659,8 +1659,8 @@
     </div>
   </footer>
 
-  <!-- Floating Quick Actions (Bottom Right Placement) -->
-  <div class="fixed bottom-5 right-5 z-40 flex flex-col items-end space-y-3 pointer-events-none">
+  <!-- Floating Quick Actions (One Line Placement Bottom Right) -->
+  <div class="fixed bottom-5 right-5 z-40 flex flex-row items-center space-x-3 space-y-0 pointer-events-none max-w-[calc(100vw-2.5rem)]">
     
     <!-- Phone Call Pill -->
     <a href="tel:+491729137112" class="pointer-events-auto group flex items-center bg-white/95 backdrop-blur-md text-slate-900 border border-slate-200/80 rounded-full py-2.5 px-4 shadow-xl hover:shadow-2xl hover:border-blue-300 transition-all duration-300 text-xs md:text-sm font-bold tracking-wide hover:-translate-y-1 space-x-2.5">
@@ -1757,12 +1757,20 @@
 
   <!-- Video Modal (Popup) -->
   <div id="video-modal-custom" onclick="if(event.target === this) closeVideoModal()">
-    <div style="position: relative; width: 100%; max-width: 860px; background: #000; border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8);">
-      <!-- Close Button -->
-      <button id="close-video-btn" onclick="closeVideoModal()" style="position: absolute; top: 12px; right: 12px; z-index: 100; width: 36px; height: 36px; border-radius: 50%; background: rgba(0,0,0,0.7); color: #fff; border: 1px solid rgba(255,255,255,0.3); font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center;" aria-label="Close video">&times;</button>
+    <div style="position: relative; width: 100%; max-width: 860px; background: #0f172a; border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8);">
+      <!-- Modal Header -->
+      <div style="padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(15,23,42,0.95);">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="display: flex; width: 32px; height: 32px; border-radius: 50%; background: #2563eb; align-items: center; justify-content: center; color: #fff;">
+            <svg style="width: 16px; height: 16px; fill: currentColor;" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </span>
+          <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: #ffffff;">Wie wir arbeiten — Prekadini ThermoTech</h3>
+        </div>
+        <button id="close-video-btn" onclick="closeVideoModal()" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.1); color: #fff; border: none; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center;" aria-label="Close video">&times;</button>
+      </div>
       <!-- Video Player Container -->
-      <div style="width: 100%; min-height: 320px; background: #000; display: flex; align-items: center; justify-content: center;">
-        <video id="modal-video-player" controls preload="auto" style="width: 100%; height: auto; max-height: 80vh; min-height: 300px; display: block; background: #000;">
+      <div style="width: 100%; background: #000; display: flex; align-items: center; justify-content: center;">
+        <video id="modal-video-player" controls preload="auto" playsinline webkit-playsinline style="width: 100%; height: auto; max-height: 75vh; min-height: 280px; display: block; background: #000;">
           <source src="work.mp4" type="video/mp4">
           Your browser does not support the video tag.
         </video>
