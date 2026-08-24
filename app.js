@@ -1228,12 +1228,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
-      const modal = document.getElementById("service-detail-modal");
-      if (modal && modal.classList.contains("active")) {
-        window.closeServiceDetailModal();
-      }
+      window.closeServiceDetailModal();
+      window.closeVideoModal();
     }
   });
+
+  // Auto close modals when scrolling the page
+  let isClosingOnScroll = false;
+  const handleScrollOrWheelClose = () => {
+    if (isClosingOnScroll) return;
+    const vModal = document.getElementById("video-modal-custom");
+    const sModal = document.getElementById("service-detail-modal");
+
+    const isVideoOpen = vModal && (vModal.classList.contains("active") || vModal.style.display === "flex");
+    const isServiceOpen = sModal && (sModal.classList.contains("active") || sModal.style.display === "flex");
+
+    if (isVideoOpen || isServiceOpen) {
+      isClosingOnScroll = true;
+      if (isVideoOpen) window.closeVideoModal();
+      if (isServiceOpen) window.closeServiceDetailModal();
+      setTimeout(() => { isClosingOnScroll = false; }, 300);
+    }
+  };
+
+  window.addEventListener("scroll", handleScrollOrWheelClose, { passive: true });
+  window.addEventListener("wheel", handleScrollOrWheelClose, { passive: true });
+  window.addEventListener("touchmove", handleScrollOrWheelClose, { passive: true });
 
   // --- INITIALIZATION TRIGGERS ---
   initFormState();
@@ -1255,7 +1275,6 @@ window.openVideoModal = function() {
     }
     modal.classList.add("active");
     modal.style.display = "flex";
-    document.body.style.overflow = "hidden";
   }
   if (video) {
     try {
@@ -1438,7 +1457,6 @@ window.openServiceDetailModal = function(key) {
   }
   modal.classList.add("active");
   modal.style.display = "flex";
-  document.body.style.overflow = "hidden";
 };
 
 window.closeServiceDetailModal = function() {
