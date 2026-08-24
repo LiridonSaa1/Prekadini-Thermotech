@@ -1225,7 +1225,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       const modal = document.getElementById("service-detail-modal");
-      if (modal && !modal.classList.contains("opacity-0")) {
+      if (modal && modal.classList.contains("active")) {
         window.closeServiceDetailModal();
       }
     }
@@ -1243,44 +1243,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Global video modal helpers available unconditionally
 window.openVideoModal = function() {
-  const videoModal = document.getElementById("video-modal");
-  const videoModalCard = document.getElementById("video-modal-card");
-  const videoPlayer = document.getElementById("modal-video-player");
-  if (videoModal && videoModalCard) {
-    videoModal.style.display = "flex";
-    videoModal.style.opacity = "1";
-    videoModal.style.pointerEvents = "auto";
-    videoModal.classList.remove("hidden", "opacity-0", "pointer-events-none");
-    videoModal.classList.add("flex", "opacity-100", "pointer-events-auto");
-
-    videoModalCard.style.opacity = "1";
-    videoModalCard.style.transform = "scale(1)";
-    videoModalCard.classList.remove("scale-95", "opacity-0");
-    videoModalCard.classList.add("scale-100", "opacity-100");
-    if (videoPlayer) {
-      videoPlayer.currentTime = 0;
-      videoPlayer.play().catch(err => console.log("Autoplay prevented:", err));
-    }
+  const modal = document.getElementById("video-modal-custom");
+  const video = document.getElementById("modal-video-player");
+  if (modal) {
+    modal.classList.add("active");
+  }
+  if (video) {
+    video.currentTime = 0;
+    video.play().catch(err => console.log("Video play error:", err));
   }
 };
 
 window.closeVideoModal = function() {
-  const videoModal = document.getElementById("video-modal");
-  const videoModalCard = document.getElementById("video-modal-card");
-  const videoPlayer = document.getElementById("modal-video-player");
-  if (videoModal && videoModalCard) {
-    if (videoPlayer) {
-      videoPlayer.pause();
-    }
-    videoModal.style.opacity = "0";
-    videoModal.style.pointerEvents = "none";
-    videoModalCard.style.opacity = "0";
-    videoModalCard.style.transform = "scale(0.95)";
-    setTimeout(() => {
-      videoModal.style.display = "none";
-      videoModal.classList.add("hidden", "opacity-0", "pointer-events-none");
-      videoModal.classList.remove("flex", "opacity-100", "pointer-events-auto");
-    }, 200);
+  const modal = document.getElementById("video-modal-custom");
+  const video = document.getElementById("modal-video-player");
+  if (video) {
+    video.pause();
+  }
+  if (modal) {
+    modal.classList.remove("active");
   }
 };
 
@@ -1294,7 +1275,7 @@ const serviceModalData = {
     img: "feature_ergebnisse.jpg",
     caption: "Hochwertige Wärmedämmung mit Blechummantelung",
     captionSq: "Izolim termik me mbështjellës metalik",
-    icon: `<svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9.879z" /></svg>`,
+    icon: `<svg style="width:28px;height:28px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9.879z" /></svg>`,
     descMain: "Professionelle Wärmedämmung für Rohrleitungen, Heizungsanlagen, Warmwasser- und Dampfleitungen in Industrie und Gewerbe. Durch den Einsatz moderner Dämmstoffe wie Steinwolle und Kautschuk mit Blechummantelung reduzieren wir Energieverluste um bis zu 85%.",
     descMainSq: "Izolim termik profesional për tubacione, sisteme ngrohjeje, ujë të ngrohtë dhe linja avulli në industri dhe objekte komerciale. Përmes materialeve më moderne si lesh guri dhe kautshuk me mbështjellës metalik, ne reduktojmë humbjet e energjisë deri në 85%.",
     descSecondary: "Exakte Passform für Armaturen, Ventile und Verteiler sorgt für makellose Optik und dauerhaften Schutz vor mechanischen Belastungen.",
@@ -1320,7 +1301,7 @@ const serviceModalData = {
     img: "feature_team.jpg",
     caption: "Diffusionsdichte Kälteisolierung für Klimaanlagen",
     captionSq: "Izolim difuziv ftohës për klimë & ujë të ftohtë",
-    icon: `<svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07L19.07 4.93M12 6L9 9M12 6l3 3M12 18l-3-3M12 18l3-3M6 12l3-3M6 12l3 3M18 12l-3-3M18 12l-3 3" /></svg>`,
+    icon: `<svg style="width:28px;height:28px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07L19.07 4.93M12 6L9 9M12 6l3 3M12 18l-3-3M12 18l3-3M6 12l3-3M6 12l3 3M18 12l-3-3M18 12l-3 3" /></svg>`,
     descMain: "Zuverlässige Isolierung von Kälte- und Klimaleitungen, Eiswasser- und Kühlmittelkreisläufen. Verhindert effizient die Bildung von Kondenswasser (Tauwasser), beugt Korrosionsschäden vor und sichert den unterbrechungsfreien Betrieb von Kühlanlagen.",
     descMainSq: "Izolim i besueshëm i linjave të ftohjes, klimatizimit dhe ujit të ftohtë. Parandalon me efikasitet formimin e ujit të kondensuar, parandalon dëmtimet nga korrozioni dhe siguron funksionimin pa ndërprerje të sistemeve ftohëse.",
     descSecondary: "Spezielle geschlossenzellige Elastomerdämmstoffe garantieren einen dauerhaft hohen Wasserdampf-Diffusionswiderstand.",
@@ -1346,7 +1327,7 @@ const serviceModalData = {
     img: "feature_garantie.jpg",
     caption: "Effektive Schallisolierung an Lüftungs- & Abwasserrohren",
     captionSq: "Izolim akustik efektiv në tubacione shkarkimi & ajri",
-    icon: `<svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>`,
+    icon: `<svg style="width:28px;height:28px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>`,
     descMain: "Effektive Schallisolierung von Abwasser- und Regenwasserleitungen, Lüftungskanälen und Maschinenräumen. Wir reduzieren Fließ- und Luftschallgeräusche drastisch für ein angenehmes Arbeits- und Wohnklima.",
     descMainSq: "Izolim efektiv akustik i tubacioneve të shkarkimit, ujërave të shiut, kanaleve të ventilimit dhe dhomave të makinerive. Ne reduktojmë dukshëm zhurmat e rrjedhjes dhe ajrit për një ambient me komoditet të lartë.",
     descSecondary: "Durch Entkopplung der Rohre vom Baukörper verhindern wir die Übertragung von Körperschall in angrenzende Räume.",
@@ -1372,7 +1353,7 @@ const serviceModalData = {
     img: "feature_service.jpg",
     caption: "Zertifizierte Rohrdurchführungen R90 / S90",
     captionSq: "Penetrime tubash të certifikuara R90 / S90",
-    icon: `<svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>`,
+    icon: `<svg style="width:28px;height:28px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>`,
     descMain: "Gesetzlich zertifizierte Brandabschottungen (S90, S120, R90) und feuerfeste Durchführungen von Rohren und Kabeln durch Wände und Decken. Beugt der Ausbreitung von Feuer und Rauch im Ernstfall zuverlässig vor.",
     descMainSq: "Abschottung dhe penetrime rezistente ndaj zjarrit të certifikuara me ligj (S90, S120, R90) për tubacione dhe kabllo përmes mureve dhe tavaneve. Parandalon me besueshmëri përhapjen e zjarrit dhe tymit.",
     descSecondary: "Vollständige Kennzeichnung mit Prüfschildern und Dokumentation für die behördliche Bauabnahme.",
@@ -1397,10 +1378,9 @@ window.openServiceDetailModal = function(key) {
   if (!data) return;
 
   const modal = document.getElementById("service-detail-modal");
-  const card = document.getElementById("service-detail-modal-card");
   const isSq = document.documentElement.lang === "sq";
 
-  if (!modal || !card) return;
+  if (!modal) return;
 
   const iconContainer = document.getElementById("service-modal-icon-container");
   const badgeEl = document.getElementById("service-modal-badge");
@@ -1424,9 +1404,9 @@ window.openServiceDetailModal = function(key) {
     const list = isSq ? data.featuresSq : data.features;
     list.forEach((item) => {
       const li = document.createElement("li");
-      li.className = "flex items-start space-x-2 bg-slate-50 p-2.5 rounded-xl border border-slate-100";
+      li.style.cssText = "display: flex; align-items: flex-start; gap: 8px; background: #f8fafc; padding: 10px; border-radius: 12px; border: 1px solid #f1f5f9;";
       li.innerHTML = `
-        <svg class="w-4 h-4 text-blue-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg style="width: 16px; height: 16px; color: #2563eb; flex-shrink: 0; margin-top: 2px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
         </svg>
         <span>${item}</span>
@@ -1435,29 +1415,12 @@ window.openServiceDetailModal = function(key) {
     });
   }
 
-  modal.style.display = "flex";
-  modal.style.opacity = "1";
-  modal.style.pointerEvents = "auto";
-  modal.classList.remove("hidden", "opacity-0", "pointer-events-none");
-  modal.classList.add("flex", "opacity-100", "pointer-events-auto");
-
-  card.style.opacity = "1";
-  card.style.transform = "scale(1)";
-  card.classList.remove("scale-95", "opacity-0");
-  card.classList.add("scale-100", "opacity-100");
+  modal.classList.add("active");
 };
 
 window.closeServiceDetailModal = function() {
   const modal = document.getElementById("service-detail-modal");
-  const card = document.getElementById("service-detail-modal-card");
-  if (!modal || !card) return;
-
-  modal.style.opacity = "0";
-  modal.style.pointerEvents = "none";
-  card.style.opacity = "0";
-  card.style.transform = "scale(0.95)";
-
-  setTimeout(() => {
-    modal.style.display = "none";
-  }, 300);
+  if (modal) {
+    modal.classList.remove("active");
+  }
 };
