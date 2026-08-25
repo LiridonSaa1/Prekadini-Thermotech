@@ -1,7 +1,6 @@
 // Supabase Connection Configuration
-// Replace these placeholders with your actual Supabase project credentials
-const SUPABASE_URL = ""; 
-const SUPABASE_ANON_KEY = "";
+let SUPABASE_URL = localStorage.getItem("supabase_url") || "https://kwzqspmyslwprwtzupuu.supabase.co"; 
+let SUPABASE_ANON_KEY = localStorage.getItem("supabase_anon_key") || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3enFzcG15c2x3cHJ3dHp1cHV1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0MjUyMTQsImV4cCI6MjEwMzAwMTIxNH0.QH9_k2T4vnf0b7saKRx9WzYyEpPYj_eQ1I6woWrp_Zo";
 
 let supabaseClient = null;
 
@@ -132,60 +131,54 @@ const mockDb = {
   // --- SERVICES ---
   getServices: async () => {
     let data = JSON.parse(localStorage.getItem("prekadini_services"));
+    // Auto-clear if the data contains cleaning services or lacks description
+    if (data && (
+      data.some(s => s.title.includes("reinigung") || s.title.includes("Reinigung") || s.title.includes("pflege")) ||
+      !data[0] || !data[0].description
+    )) {
+      localStorage.removeItem("prekadini_services");
+      data = null;
+    }
     if (!data) {
       data = [
         {
           id: "srv-1",
-          title: "Unterhaltsreinigung",
-          price: "ab 25",
-          photo: "kaelteschutz.jpg",
-          checklist: ["Staubwischen & Saugen", "Nasswischen der Böden", "Müllentsorgung", "Oberflächenreinigung"],
-          benefits: ["Regelmäßige Sauberkeit", "Individueller Turnus", "Werterhalt Ihrer Räume"],
+          title: "Wärmeschutz",
+          price: "auf Anfrage",
+          photo: "warmeschutz.jpg",
+          description: "Dämmung von Heizungs- und Warmwasserleitungen. Minimiert Energieverluste spürbar.",
+          checklist: ["Heizungsrohrdämmung", "Warmwasserleitungen", "Armaturen- & Flanschendämmung", "GEG-Konformität"],
+          benefits: ["Energieersparnis", "Heizkostenreduktion", "CO2-Minderung"],
           active: true
         },
         {
           id: "srv-2",
-          title: "Büroreinigung",
-          price: "ab 30",
-          photo: "brandschutz.jpg",
-          checklist: ["Schreibtischdesinfektion", "Tastatur- & Monitorreinigung", "Kaffeeküchen-Reinigung", "Sanitärbereich"],
-          benefits: ["Gesteigertes Wohlbefinden", "Professioneller Eindruck", "Gesundes Arbeitsklima"],
+          title: "Kälteschutz",
+          price: "auf Anfrage",
+          photo: "kaelteschutz.jpg",
+          description: "Isolierung von Kälte- und Klimaleitungen. Verhindert zuverlässig Tauwasserbildung.",
+          checklist: ["Klimaleitungskühlung", "Kaltwasserleitungen", "Tauwasservermeidung", "Korrosionsschutz"],
+          benefits: ["Kondensatvermeidung", "Temperaturerhalt", "Langlebiger Systemschutz"],
           active: true
         },
         {
           id: "srv-3",
-          title: "Glas- & Fensterreinigung",
-          price: "ab 35",
+          title: "Schallschutz",
+          price: "auf Anfrage",
           photo: "schallschutz.jpg",
-          checklist: ["Fensterscheiben innen/außen", "Rahmen & Falzen wischen", "Schaufensterreinigung", "Glasfassadenpflege"],
-          benefits: ["Kristallklare Sicht", "Streifenfreier Glanz", "Hochwertiges Erscheinungsbild"],
+          description: "Schallisolierung von Rohrleitungen und Lüftungen zur Minderung von Fließgeräuschen.",
+          checklist: ["Rohrleitungsschallschutz", "Lüftungskanalschallschutz", "Körperschallminderung", "Sanitärleitungsdämmung"],
+          benefits: ["Geräuschminderung", "Ruhiges Wohnen", "Normgerechter Schutz"],
           active: true
         },
         {
           id: "srv-4",
-          title: "Baureinigung",
-          price: "ab 45",
-          photo: "warmeschutz.jpg",
-          checklist: ["Bauschuttentsorgung", "Zementschleierentfernung", "Feinstaubabsaugung", "Grundreinigung nach Bau"],
-          benefits: ["Schnelle Bezugsfertigkeit", "Mängelerkennung erleichtert", "Fachgerechte Entsorgung"],
-          active: true
-        },
-        {
-          id: "srv-5",
-          title: "Sonderreinigung",
-          price: "ab 40",
-          photo: "kaelteschutz.jpg",
-          checklist: ["Teppich- & Polsterreinigung", "Hartbodenbeschichtung", "Fassaden-Spezialreinigung", "Desinfektion"],
-          benefits: ["Spezialwerkzeuge im Einsatz", "Hartnäckiger Schmutz weg", "Langfristiger Schutz"],
-          active: true
-        },
-        {
-          id: "srv-6",
-          title: "Gartenpflege & Winterdienst",
-          price: "ab 29",
+          title: "Brandschutz",
+          price: "auf Anfrage",
           photo: "brandschutz.jpg",
-          checklist: ["Rasenmähen & Heckenschnitt", "Unkrautbeseitigung", "Schneeräumung nach StVO", "Streuen gegen Glätte"],
-          benefits: ["Ganzjährig gepflegt", "Haftungssicherheit im Winter", "Werterhalt Außenanlagen"],
+          description: "Zertifizierte Brandabschottungen zur Einhaltung gesetzlicher Sicherheitsstandards.",
+          checklist: ["Brandabschottungen S90/S120", "Rohrdurchführungen", "Kabelabschottung", "Zertifizierte Systemmontage"],
+          benefits: ["Hohe Gebäudesicherheit", "Gesetzliche Konformität", "Rauchschutz im Brandfall"],
           active: true
         }
       ];
@@ -321,8 +314,23 @@ const mockDb = {
         working_hours: "Mo. - Fr.: 08:00 - 17:00 Uhr",
         whatsapp: "491729137112",
         brevo_api_key: "",
-        admin_password: "admin123"
+        admin_password: "admin123",
+        about_video_url: "work.mp4",
+        services_label: "WER WIR SIND",
+        services_subtitle: "Engagiert für effiziente<br><span class=\"text-blue-600\">professionelle Dämmung</span>.",
+        services_tagline: "UNSERE LEISTUNGEN & EXPERTISE",
+        services_title: "Professionelle Dämmung für<br><span class=\"text-blue-600\">Gewerbe, Industrie &amp; Privat</span>"
       };
+      localStorage.setItem("prekadini_settings", JSON.stringify(data));
+    }
+    // Auto-migrate if any headings or labels are missing
+    let modified = false;
+    if (!data.about_video_url) { data.about_video_url = "work.mp4"; modified = true; }
+    if (!data.services_label) { data.services_label = "WER WIR SIND"; modified = true; }
+    if (!data.services_subtitle) { data.services_subtitle = "Engagiert für effiziente<br><span class=\"text-blue-600\">professionelle Dämmung</span>."; modified = true; }
+    if (!data.services_tagline) { data.services_tagline = "UNSERE LEISTUNGEN & EXPERTISE"; modified = true; }
+    if (!data.services_title) { data.services_title = "Professionelle Dämmung für<br><span class=\"text-blue-600\">Gewerbe, Industrie &amp; Privat</span>"; modified = true; }
+    if (modified) {
       localStorage.setItem("prekadini_settings", JSON.stringify(data));
     }
     return data;
@@ -403,6 +411,7 @@ const mockDb = {
 // Unified review service layer that automatically switches between Supabase and LocalStorage
 const ReviewService = {
   fetchApprovedReviews: async () => {
+    let supabaseData = null;
     if (supabaseClient) {
       try {
         const { data, error } = await supabaseClient
@@ -410,103 +419,114 @@ const ReviewService = {
           .select("*")
           .eq("approved", true)
           .order("created_at", { ascending: false });
-        if (error) throw error;
-        return data;
+        if (!error && data && data.length > 0) {
+          supabaseData = data;
+        }
       } catch (err) {
         console.warn("Supabase fetch failed, falling back to LocalStorage:", err);
-        const all = await mockDb.getReviews();
-        return all.filter(r => r.approved);
       }
-    } else {
-      const all = await mockDb.getReviews();
-      return all.filter(r => r.approved);
     }
+    const localAll = await mockDb.getReviews();
+    const localApproved = localAll.filter(r => r.approved);
+
+    if (supabaseData && supabaseData.length > 0) {
+      const ids = new Set(supabaseData.map(r => r.id));
+      const extraLocal = localApproved.filter(r => !ids.has(r.id));
+      return [...supabaseData, ...extraLocal];
+    }
+    return localApproved;
   },
   fetchAllReviews: async () => {
+    let supabaseData = null;
     if (supabaseClient) {
       try {
         const { data, error } = await supabaseClient
           .from("reviews")
           .select("*")
           .order("created_at", { ascending: false });
-        if (error) throw error;
-        return data;
+        if (!error && data && data.length > 0) {
+          supabaseData = data;
+        }
       } catch (err) {
         console.warn("Supabase fetch failed, falling back to LocalStorage:", err);
-        return await mockDb.getReviews();
       }
-    } else {
-      return await mockDb.getReviews();
     }
+    const localAll = await mockDb.getReviews();
+    if (supabaseData && supabaseData.length > 0) {
+      const ids = new Set(supabaseData.map(r => r.id));
+      const extraLocal = localAll.filter(r => !ids.has(r.id));
+      return [...supabaseData, ...extraLocal];
+    }
+    return localAll;
   },
   addReview: async (name, email, service, rating, text) => {
-    const newRecord = { name, email, service, rating, text };
+    const newRecord = { 
+      id: "rev-" + Math.random().toString(36).substring(2, 11),
+      name, 
+      email, 
+      service, 
+      rating: parseFloat(rating), 
+      text,
+      approved: false,
+      created_at: new Date().toISOString()
+    };
+    await mockDb.insertReview(newRecord);
     if (supabaseClient) {
       try {
         const { data, error } = await supabaseClient
           .from("reviews")
           .insert([newRecord])
           .select();
-        if (error) throw error;
-        return data[0];
+        if (!error && data && data[0]) {
+          return data[0];
+        }
       } catch (err) {
-        console.warn("Supabase insert failed, falling back to LocalStorage:", err);
-        return await mockDb.insertReview(newRecord);
+        console.warn("Supabase insert failed, stored in LocalStorage:", err);
       }
-    } else {
-      return await mockDb.insertReview(newRecord);
     }
+    return newRecord;
   },
   approveReview: async (id) => {
+    await mockDb.updateReviewStatus(id, true);
     if (supabaseClient) {
       try {
-        const { error } = await supabaseClient
+        await supabaseClient
           .from("reviews")
           .update({ approved: true })
           .eq("id", id);
-        if (error) throw error;
-        return true;
       } catch (err) {
-        console.warn("Supabase update failed, falling back to LocalStorage:", err);
-        return await mockDb.updateReviewStatus(id, true);
+        console.warn("Supabase update failed:", err);
       }
-    } else {
-      return await mockDb.updateReviewStatus(id, true);
     }
+    return true;
   },
   rejectReview: async (id) => {
+    await mockDb.updateReviewStatus(id, false);
     if (supabaseClient) {
       try {
-        const { error } = await supabaseClient
+        await supabaseClient
           .from("reviews")
           .update({ approved: false })
           .eq("id", id);
-        if (error) throw error;
-        return true;
       } catch (err) {
-        console.warn("Supabase update failed, falling back to LocalStorage:", err);
-        return await mockDb.updateReviewStatus(id, false);
+        console.warn("Supabase update failed:", err);
       }
-    } else {
-      return await mockDb.updateReviewStatus(id, false);
     }
+    return true;
   },
   deleteReview: async (id) => {
+    await mockDb.deleteReview(id);
     if (supabaseClient) {
       try {
-        const { error } = await supabaseClient
+        await supabaseClient
           .from("reviews")
           .delete()
           .eq("id", id);
-        if (error) throw error;
-        return true;
       } catch (err) {
-        console.warn("Supabase delete failed, falling back to LocalStorage:", err);
-        return await mockDb.deleteReview(id);
+        console.warn("Supabase delete failed:", err);
       }
-    } else {
-      return await mockDb.deleteReview(id);
     }
+    return true;
   }
 };
 
@@ -514,52 +534,50 @@ const ReviewService = {
 
 const InquiryService = {
   fetchInquiries: async () => {
+    let supabaseData = null;
     if (supabaseClient) {
       try {
         const { data, error } = await supabaseClient.from("inquiries").select("*").order("created_at", { ascending: false });
-        if (error) throw error;
-        return data;
-      } catch (err) {
-        return await mockDb.getInquiries();
-      }
+        if (!error && data && data.length > 0) {
+          supabaseData = data;
+        }
+      } catch (err) {}
     }
-    return await mockDb.getInquiries();
+    const local = await mockDb.getInquiries();
+    if (supabaseData && supabaseData.length > 0) {
+      const ids = new Set(supabaseData.map(r => r.id));
+      const extraLocal = local.filter(r => !ids.has(r.id));
+      return [...supabaseData, ...extraLocal];
+    }
+    return local;
   },
   addInquiry: async (inq) => {
+    const localRes = await mockDb.insertInquiry(inq);
     if (supabaseClient) {
       try {
         const { data, error } = await supabaseClient.from("inquiries").insert([inq]).select();
-        if (error) throw error;
-        return data[0];
-      } catch (err) {
-        return await mockDb.insertInquiry(inq);
-      }
+        if (!error && data && data[0]) return data[0];
+      } catch (err) {}
     }
-    return await mockDb.insertInquiry(inq);
+    return localRes;
   },
   updateStatus: async (id, status) => {
+    await mockDb.updateInquiryStatus(id, status);
     if (supabaseClient) {
       try {
-        const { error } = await supabaseClient.from("inquiries").update({ status }).eq("id", id);
-        if (error) throw error;
-        return true;
-      } catch (err) {
-        return await mockDb.updateInquiryStatus(id, status);
-      }
+        await supabaseClient.from("inquiries").update({ status }).eq("id", id);
+      } catch (err) {}
     }
-    return await mockDb.updateInquiryStatus(id, status);
+    return true;
   },
   deleteInquiry: async (id) => {
+    await mockDb.deleteInquiry(id);
     if (supabaseClient) {
       try {
-        const { error } = await supabaseClient.from("inquiries").delete().eq("id", id);
-        if (error) throw error;
-        return true;
-      } catch (err) {
-        return await mockDb.deleteInquiry(id);
-      }
+        await supabaseClient.from("inquiries").delete().eq("id", id);
+      } catch (err) {}
     }
-    return await mockDb.deleteInquiry(id);
+    return true;
   },
   sendBrevoOffer: async (inquiry, subject, text, apiKey) => {
     if (!apiKey) {
@@ -576,7 +594,7 @@ const InquiryService = {
         },
         body: JSON.stringify({
           sender: {
-            name: "DuAri Hausmeister",
+            name: "Prekadini ThermoTech",
             email: "duariservice@gmail.com"
           },
           to: [
@@ -602,144 +620,149 @@ const InquiryService = {
 
 const ContactService = {
   fetchMessages: async () => {
+    let supabaseData = null;
     if (supabaseClient) {
       try {
         const { data, error } = await supabaseClient.from("contact_messages").select("*").order("created_at", { ascending: false });
-        if (error) throw error;
-        return data;
-      } catch (err) {
-        return await mockDb.getContactMessages();
-      }
+        if (!error && data && data.length > 0) {
+          supabaseData = data;
+        }
+      } catch (err) {}
     }
-    return await mockDb.getContactMessages();
+    const local = await mockDb.getContactMessages();
+    if (supabaseData && supabaseData.length > 0) {
+      const ids = new Set(supabaseData.map(r => r.id));
+      const extraLocal = local.filter(r => !ids.has(r.id));
+      return [...supabaseData, ...extraLocal];
+    }
+    return local;
   },
   addMessage: async (msg) => {
+    const localRes = await mockDb.insertContactMessage(msg);
     if (supabaseClient) {
       try {
         const { data, error } = await supabaseClient.from("contact_messages").insert([msg]).select();
-        if (error) throw error;
-        return data[0];
-      } catch (err) {
-        return await mockDb.insertContactMessage(msg);
-      }
+        if (!error && data && data[0]) return data[0];
+      } catch (err) {}
     }
-    return await mockDb.insertContactMessage(msg);
+    return localRes;
   },
   markAsRead: async (id, read) => {
+    await mockDb.markContactMessageRead(id, read);
     if (supabaseClient) {
       try {
-        const { error } = await supabaseClient.from("contact_messages").update({ read }).eq("id", id);
-        if (error) throw error;
-        return true;
-      } catch (err) {
-        return await mockDb.markContactMessageRead(id, read);
-      }
+        await supabaseClient.from("contact_messages").update({ read }).eq("id", id);
+      } catch (err) {}
     }
-    return await mockDb.markContactMessageRead(id, read);
+    return true;
   },
   deleteMessage: async (id) => {
+    await mockDb.deleteContactMessage(id);
     if (supabaseClient) {
       try {
-        const { error } = await supabaseClient.from("contact_messages").delete().eq("id", id);
-        if (error) throw error;
-        return true;
-      } catch (err) {
-        return await mockDb.deleteContactMessage(id);
-      }
+        await supabaseClient.from("contact_messages").delete().eq("id", id);
+      } catch (err) {}
     }
-    return await mockDb.deleteContactMessage(id);
+    return true;
   }
 };
-
 const ServiceManager = {
   fetchServices: async () => {
     if (supabaseClient) {
       try {
-        const { data, error } = await supabaseClient.from("services").select("*").order("title", { ascending: true });
+        let { data, error } = await supabaseClient.from("services").select("*").order("title", { ascending: true });
         if (error) throw error;
+
+        // Auto-seed or clean up old cleaning services in Supabase table
+        const hasCleaning = data && data.some(s => s.title.toLowerCase().includes("reinigung") || s.title.toLowerCase().includes("pflege"));
+        if (!data || data.length === 0 || hasCleaning) {
+          console.log("Seeding default insulation services to Supabase...");
+          if (hasCleaning) {
+            await supabaseClient.from("services").delete().neq("id", "keep-none");
+          }
+          const mockServices = await mockDb.getServices();
+          for (let srv of mockServices) {
+            await supabaseClient.from("services").insert(srv);
+          }
+          const refetched = await supabaseClient.from("services").select("*").order("title", { ascending: true });
+          if (!refetched.error) {
+            data = refetched.data;
+          } else {
+            data = mockServices;
+          }
+        }
         return data;
       } catch (err) {
+        console.error("Supabase services fetch failed, falling back to mockDb:", err);
         return await mockDb.getServices();
       }
     }
     return await mockDb.getServices();
   },
   saveService: async (srv) => {
+    await mockDb.saveService(srv);
     if (supabaseClient) {
       try {
-        let error;
         if (srv.id) {
-          const { error: err } = await supabaseClient.from("services").update(srv).eq("id", srv.id);
-          error = err;
+          await supabaseClient.from("services").update(srv).eq("id", srv.id);
         } else {
-          const { error: err } = await supabaseClient.from("services").insert([srv]);
-          error = err;
+          await supabaseClient.from("services").insert([srv]);
         }
-        if (error) throw error;
-        return true;
-      } catch (err) {
-        return await mockDb.saveService(srv);
-      }
+      } catch (err) {}
     }
-    return await mockDb.saveService(srv);
+    return true;
   },
   deleteService: async (id) => {
+    await mockDb.deleteService(id);
     if (supabaseClient) {
       try {
-        const { error } = await supabaseClient.from("services").delete().eq("id", id);
-        if (error) throw error;
-        return true;
-      } catch (err) {
-        return await mockDb.deleteService(id);
-      }
+        await supabaseClient.from("services").delete().eq("id", id);
+      } catch (err) {}
     }
-    return await mockDb.deleteService(id);
+    return true;
   }
 };
 
 const ProjectService = {
   fetchProjects: async () => {
+    let supabaseData = null;
     if (supabaseClient) {
       try {
         const { data, error } = await supabaseClient.from("projects").select("*").order("created_at", { ascending: false });
-        if (error) throw error;
-        return data;
-      } catch (err) {
-        return await mockDb.getProjects();
-      }
+        if (!error && data && data.length > 0) {
+          supabaseData = data;
+        }
+      } catch (err) {}
     }
-    return await mockDb.getProjects();
+    const local = await mockDb.getProjects();
+    if (supabaseData && supabaseData.length > 0) {
+      const ids = new Set(supabaseData.map(r => r.id));
+      const extraLocal = local.filter(r => !ids.has(r.id));
+      return [...supabaseData, ...extraLocal];
+    }
+    return local;
   },
   saveProject: async (proj) => {
+    await mockDb.saveProject(proj);
     if (supabaseClient) {
       try {
-        let error;
         if (proj.id) {
-          const { error: err } = await supabaseClient.from("projects").update(proj).eq("id", proj.id);
-          error = err;
+          await supabaseClient.from("projects").update(proj).eq("id", proj.id);
         } else {
-          const { error: err } = await supabaseClient.from("projects").insert([proj]);
-          error = err;
+          await supabaseClient.from("projects").insert([proj]);
         }
-        if (error) throw error;
-        return true;
-      } catch (err) {
-        return await mockDb.saveProject(proj);
-      }
+      } catch (err) {}
     }
-    return await mockDb.saveProject(proj);
+    return true;
   },
   deleteProject: async (id) => {
+    await mockDb.deleteProject(id);
     if (supabaseClient) {
       try {
-        const { error } = await supabaseClient.from("projects").delete().eq("id", id);
-        if (error) throw error;
-        return true;
-      } catch (err) {
-        return await mockDb.deleteProject(id);
-      }
+        await supabaseClient.from("projects").delete().eq("id", id);
+      } catch (err) {}
     }
-    return await mockDb.deleteProject(id);
+    return true;
   }
 };
 
@@ -747,10 +770,24 @@ const VorteileService = {
   fetchVorteile: async () => {
     if (supabaseClient) {
       try {
-        const { data, error } = await supabaseClient.from("vorteile_about").select("*").order("sort_order", { ascending: true });
+        let { data, error } = await supabaseClient.from("vorteile_about").select("*").order("sort_order", { ascending: true });
         if (error) throw error;
+        if (!data || data.length === 0) {
+          console.log("Seeding default advantages to Supabase...");
+          const mockVorteile = await mockDb.getVorteile();
+          for (let vt of mockVorteile) {
+            await supabaseClient.from("vorteile_about").insert(vt);
+          }
+          const refetched = await supabaseClient.from("vorteile_about").select("*").order("sort_order", { ascending: true });
+          if (!refetched.error) {
+            data = refetched.data;
+          } else {
+            data = mockVorteile;
+          }
+        }
         return data;
       } catch (err) {
+        console.error("Supabase advantages fetch failed, falling back to mockDb:", err);
         return await mockDb.getVorteile();
       }
     }

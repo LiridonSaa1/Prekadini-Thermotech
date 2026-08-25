@@ -1,3 +1,85 @@
+window.showAlert = (message, title = "Hinweis") => {
+  let modal = document.getElementById("custom-alert-modal");
+  if (!modal) {
+    modal = document.createElement("div");
+    modal.id = "custom-alert-modal";
+    modal.className = "fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300";
+    modal.innerHTML = `
+      <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl border border-slate-100 transform scale-95 transition-all duration-300 flex flex-col items-center">
+        <div class="w-16 h-16 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 text-2xl mb-4 shrink-0">
+          <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h3 id="custom-alert-title" class="text-lg font-extrabold text-slate-900 leading-tight"></h3>
+        <p id="custom-alert-message" class="mt-2.5 text-slate-500 text-sm leading-relaxed"></p>
+        <button onclick="closeCustomAlert()" class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-3.5 rounded-xl transition-all shadow-md">
+          OK
+        </button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  }
+  
+  const titleEl = document.getElementById("custom-alert-title");
+  const msgEl = document.getElementById("custom-alert-message");
+  if (titleEl) titleEl.innerText = title;
+  if (msgEl) msgEl.innerText = message;
+  
+  modal.classList.remove("opacity-0", "pointer-events-none");
+  setTimeout(() => {
+    const box = modal.querySelector(".bg-white");
+    if (box) box.classList.remove("scale-95");
+  }, 10);
+};
+
+window.closeCustomAlert = () => {
+  const modal = document.getElementById("custom-alert-modal");
+  if (modal) {
+    const box = modal.querySelector(".bg-white");
+    if (box) box.classList.add("scale-95");
+    modal.classList.add("opacity-0", "pointer-events-none");
+  }
+};
+
+window.loadConfetti = () => {
+  return new Promise((resolve) => {
+    if (typeof confetti !== "undefined") {
+      resolve(confetti);
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js";
+    script.onload = () => resolve(window.confetti);
+    document.head.appendChild(script);
+  });
+};
+
+window.triggerCelebration = () => {
+  window.loadConfetti().then((conf) => {
+    if (conf) {
+      conf({ particleCount: 100, spread: 70, origin: { x: 0.2, y: 0.6 } });
+      conf({ particleCount: 100, spread: 70, origin: { x: 0.8, y: 0.6 } });
+    }
+  });
+};
+
+window.sendNotificationEmail = async (subject, htmlContent) => {
+  if (!window.websiteSettings || !window.websiteSettings.brevo_api_key) {
+    console.warn("No Brevo API key configured, skipping notification email.");
+    return;
+  }
+  try {
+    await InquiryService.sendBrevoOffer({
+      email: "duariservice@gmail.com",
+      name: "Prekadini ThermoTech Admin"
+    }, subject, htmlContent, window.websiteSettings.brevo_api_key);
+    console.log("Admin notification email sent successfully via Brevo!");
+  } catch (e) {
+    console.error("Failed to send admin notification email:", e);
+  }
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   // --- Language Switcher Configuration ---
   const defaultLang = "de";
@@ -442,6 +524,25 @@ document.addEventListener("DOMContentLoaded", () => {
         message: inquiryData.message
       });
 
+      // Trigger confetti celebration!
+      window.triggerCelebration();
+
+      // Send notification email to admin!
+      window.sendNotificationEmail(`Neue Kalkulator-Anfrage von ${inquiryData.name}`, `
+        <h3>Neue Kalkulator-Anfrage erhalten</h3>
+        <p><strong>Name:</strong> ${inquiryData.name}</p>
+        <p><strong>E-Mail:</strong> ${inquiryData.email}</p>
+        <p><strong>Telefon:</strong> ${inquiryData.phone}</p>
+        <p><strong>Gewünschte Leistung:</strong> ${inquiryData.service}</p>
+        <p><strong>Größe (qm):</strong> ${inquiryData.size}</p>
+        <p><strong>Räume:</strong> ${inquiryData.rooms}</p>
+        <p><strong>Badezimmer:</strong> ${inquiryData.bathrooms}</p>
+        <p><strong>Fenster:</strong> ${inquiryData.windows}</p>
+        <p><strong>Adresse/Ort:</strong> ${inquiryData.location}</p>
+        <p><strong>Wunschtermin:</strong> ${inquiryData.date}</p>
+        <p><strong>Nachricht:</strong><br>${inquiryData.message || "Keine Nachricht"}</p>
+      `);
+
       setTimeout(() => {
         if (loader) {
           loader.classList.remove("opacity-100");
@@ -459,7 +560,12 @@ document.addEventListener("DOMContentLoaded", () => {
       }, 1000);
     } catch (err) {
       console.error(err);
-      alert("Error submitting request.");
+      window.showAlert(
+        document.documentElement.lang === "sq"
+          ? "Dërgimi i kalkulimit dështoi. Ju lutem provoni përsëri!"
+          : "Fehler beim Absenden der Berechnung. Bitte versuchen Sie es erneut.",
+        document.documentElement.lang === "sq" ? "Gabim" : "Fehler"
+      );
       if (loader) {
         loader.classList.remove("opacity-100");
         loader.classList.add("opacity-0", "pointer-events-none");
@@ -522,16 +628,23 @@ document.addEventListener("DOMContentLoaded", () => {
     const email = document.getElementById("rev-email").value;
     const service = document.getElementById("rev-service").value;
     const text = document.getElementById("rev-text").value;
-
     try {
       await ReviewService.addReview(name, email, service, currentSubmitRating, text);
-      alert(document.documentElement.lang === "sq" 
-        ? "Vlerësimi juaj u dërgua me sukses dhe do të shfaqet pasi të miratohet nga administratori!" 
-        : "Ihre Bewertung wurde erfolgreich gesendet und wird angezeigt, sobald sie vom Administrator freigegeben wurde!");
+      window.showAlert(
+        document.documentElement.lang === "sq" 
+          ? "Vlerësimi juaj u dërgua me sukses dhe do të shfaqet pasi të miratohet nga administratori!" 
+          : "Ihre Bewertung wurde erfolgreich gesendet und wird angezeigt, sobald sie vom Administrator freigegeben wurde!",
+        document.documentElement.lang === "sq" ? "Faleminderit!" : "Vielen Dank!"
+      );
       closeReviewModal();
     } catch (err) {
       console.error("Failed to submit review:", err);
-      alert("Failed to submit review. Please try again.");
+      window.showAlert(
+        document.documentElement.lang === "sq"
+          ? "Dërgimi i vlerësimit dështoi. Ju lutem provoni përsëri!"
+          : "Fehler beim Absenden der Bewertung. Bitte versuchen Sie es erneut.",
+        document.documentElement.lang === "sq" ? "Gabim" : "Fehler"
+      );
     }
   };
 
@@ -557,10 +670,10 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const renderReviewsSlider = () => {
-    const list = document.getElementById("reviews-cards-list");
+    const list = document.getElementById("reviews-cards-list") || document.getElementById("reviews-slider-content");
     if (!list) return;
 
-    if (approvedReviews.length === 0) {
+    if (!approvedReviews || approvedReviews.length === 0) {
       list.innerHTML = `
         <div class="bg-blue-50/40 rounded-3xl p-10 max-w-2xl mx-auto border border-slate-100 text-center text-slate-400">
           <p class="font-bold">Keine Bewertungen vorhanden</p>
@@ -569,11 +682,15 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    if (activeReviewIndex >= approvedReviews.length) {
+      activeReviewIndex = 0;
+    }
+
     const review = approvedReviews[activeReviewIndex];
     let starsHtml = "";
     for (let i = 1; i <= 5; i++) {
       starsHtml += `
-        <svg class="w-5 h-5 ${i <= review.rating ? 'text-amber-400' : 'text-slate-200'}" fill="currentColor" viewBox="0 0 20 20">
+        <svg class="w-5 h-5 ${i <= (review.rating || 5) ? 'text-amber-400' : 'text-slate-200'}" fill="currentColor" viewBox="0 0 20 20">
           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
         </svg>
       `;
@@ -581,15 +698,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
     list.innerHTML = `
       <div class="bg-blue-50/40 rounded-3xl p-8 md:p-10 max-w-2xl mx-auto border border-slate-100/60 shadow-md relative text-left">
-        <div class="flex items-center space-x-1.5 mb-6">${starsHtml}</div>
-        <p class="text-slate-800 text-base md:text-lg italic font-medium leading-relaxed">"${review.text}"</p>
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center space-x-1.5">${starsHtml}</div>
+          ${approvedReviews.length > 1 ? `
+            <div class="flex items-center space-x-2">
+              <button onclick="prevReview()" class="w-8 h-8 rounded-full bg-white border border-slate-200 text-slate-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all shadow-sm">
+                ‹
+              </button>
+              <span class="text-xs font-semibold text-slate-400">${activeReviewIndex + 1} / ${approvedReviews.length}</span>
+              <button onclick="nextReview()" class="w-8 h-8 rounded-full bg-white border border-slate-200 text-slate-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all shadow-sm">
+                ›
+              </button>
+            </div>
+          ` : ''}
+        </div>
+        <p class="text-slate-800 text-base md:text-lg italic font-medium leading-relaxed">"${review.text || ''}"</p>
         <div class="flex items-center space-x-3 mt-8 border-t border-slate-100 pt-6">
           <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm">
-            ${review.name.charAt(0).toUpperCase()}
+            ${review.name ? review.name.charAt(0).toUpperCase() : 'K'}
           </div>
           <div>
-            <h4 class="text-sm font-bold text-slate-900">${review.name}</h4>
-            <span class="text-slate-400 text-xs font-semibold block">${review.service || 'Service'}</span>
+            <h4 class="text-sm font-bold text-slate-900">${review.name || 'Kunde'}</h4>
+            <span class="text-slate-400 text-xs font-semibold block">${review.service || 'Dämmung & Isolierung'}</span>
           </div>
         </div>
       </div>
@@ -699,17 +829,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const faqData = [
     {
       id: "faq-1",
-      q: "Welche Reinigungsleistungen bieten Sie an?",
-      qSq: "Çfarë shërbimesh pastrimi ofroni?",
-      a: "Wir bieten ein umfassendes Spektrum: Unterhaltsreinigung, Büroreinigung, Glas- & Fensterreinigung, Baureinigung, Sonderreinigung sowie Gartenpflege und Winterdienst für Ihr Gebäude.",
-      aSq: "Ne ofrojmë një gamë të plotë: pastrim të rregullt, pastrim zyrash, pastrim xhamash & dritaresh, pastrim pas ndërtimit, pastrime speciale si dhe mirëmbajtje kopshtesh e shërbim dimëror për objektin tuaj."
+      q: "Welche Isolierungsleistungen bieten Sie an?",
+      qSq: "Çfarë shërbimesh izolimi ofroni?",
+      a: "Wir bieten ein umfassendes Spektrum an technischen Isolierungen: Wärmeschutz (Heizung & Warmwasser), Kälteschutz (Klima- & Kälteleitungen), Schallschutz für Rohre und Lüftungen sowie zertifizierten Brandschutz.",
+      aSq: "Ne ofrojmë një gamë të plotë të izolimeve teknike: izolim termik (ngrohje & ujë i ngrohtë), izolim ndaj të ftohtit (sisteme klimatizimi), izolim akustik për gypa dhe ventilim, si dhe izolim të certifikuar kundër zjarrit (Brandschutz)."
     },
     {
       id: "faq-2",
-      q: "Wie viel kostet eine professionelle Reinigung?",
-      qSq: "Sa kushton një pastrim profesional?",
-      a: "Die Kosten richten sich transparent nach der Gesamtfläche in m², der Anzahl der Zimmer und Fenster sowie der gewünschten Serviceart. Wir erstellen für Sie ein kostenloses Festpreis-Angebot.",
-      aSq: "Kostot përcaktohen në mënyrë transparente sipas sipërfaqes në m², numrit të dhomave dhe dritareve, si dhe llojit të shërbimit. Ne krijojmë një ofertë falas me çmim fiks për ju."
+      q: "Wie viel kostet eine professionelle Dämmung?",
+      qSq: "Sa kushton një izolim profesional?",
+      a: "Die Kosten richten sich transparent nach dem Umfang der Leitungen (in Metern) bzw. Flächen, dem gewählten Dämmstoff und den baulichen Gegebenheiten vor Ort. Wir erstellen gerne ein kostenloses Festpreis-Angebot.",
+      aSq: "Kostot përcaktohen në mënyrë transparente sipas gjatësisë së gypave (në metra) ose sipërfaqeve, materialit izolues të përzgjedhur dhe kushteve në objekt. Ne krijojmë një ofertë falas me çmim fiks për ju."
     },
     {
       id: "faq-3",
@@ -778,14 +908,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const answerText = isSq ? item.aSq : item.a;
 
       const faqItemHTML = `
-        <div onclick="toggleFaq('${item.id}')" class="group glass-card rounded-3xl p-6 cursor-pointer select-none text-left transition-all duration-300 ${isActive ? '!bg-gradient-to-br !from-blue-600 !to-blue-700 !border-blue-500 !text-white shadow-xl shadow-blue-600/25' : 'text-slate-800' }">
+        <div onclick="toggleFaq('${item.id}')" class="group transition-all duration-300 rounded-3xl p-6 cursor-pointer select-none text-left ${isActive ? 'bg-blue-600 border border-blue-600 text-white shadow-lg' : 'bg-blue-50/40 hover:bg-blue-50/80 border border-slate-100/60 text-slate-800' }">
           <div class="flex justify-between items-center gap-4">
-            <h3 class="font-bold text-sm md:text-base leading-snug ${isActive ? 'text-white' : 'text-slate-800 group-hover:text-blue-600 transition-colors'}">${questionText}</h3>
-            <span class="text-xl md:text-2xl font-normal shrink-0 transition-transform ${isActive ? 'text-blue-100 rotate-180' : 'text-slate-400 group-hover:text-blue-600 group-hover:scale-110'}">
+            <h3 class="font-bold text-sm md:text-base leading-snug">${questionText}</h3>
+            <span class="text-xl md:text-2xl font-normal shrink-0 ${isActive ? 'text-blue-100' : 'text-slate-400 group-hover:text-blue-600' }">
               ${isActive ? '—' : '+'}
             </span>
           </div>
-          ${isActive ? `<p class="text-xs md:text-sm text-blue-50/95 mt-4 leading-relaxed font-medium border-t border-blue-500/40 pt-3 transition-all duration-300">${answerText}</p>` : ''}
+          ${isActive ? `<p class="text-xs md:text-sm text-blue-50/90 mt-4 leading-relaxed font-semibold transition-all duration-300">${answerText}</p>` : ''}
         </div>
       `;
 
@@ -813,9 +943,9 @@ document.addEventListener("DOMContentLoaded", () => {
           <div>
             <h4 class="font-extrabold text-slate-900 text-xs uppercase mb-1">Angaben gemäß § 5 TMG</h4>
             <p class="text-slate-600">
-              DuAri Hausmeister<br>
-              Münchner Straße 12<br>
-              80331 München<br>
+              Prekadini ThermoTech<br>
+              Holznerstraße 112<br>
+              85053 Ingolstadt<br>
               Deutschland
             </p>
           </div>
@@ -836,7 +966,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } else if (type === "agb") {
       titleEl.innerText = "Allgemeine Geschäftsbedingungen (AGB)";
       bodyEl.innerHTML = `
-        <p class="text-slate-600">Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für alle Verträge und Dienstleistungen zwischen DuAri Hausmeister und unseren Kunden.</p>
+        <p class="text-slate-600">Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für alle Verträge und Dienstleistungen zwischen Prekadini ThermoTech und unseren Kunden.</p>
       `;
     }
 
@@ -866,6 +996,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       // 1. Fetch & Apply Settings
       websiteSettings = await SettingsService.fetchSettings();
+      window.websiteSettings = websiteSettings;
       if (websiteSettings) {
         document.querySelectorAll('a[href^="tel:"]').forEach(el => {
           if (websiteSettings.phone) {
@@ -877,83 +1008,160 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         });
         document.querySelectorAll('a[href*="wa.me"]').forEach(el => {
-          el.href = `https://wa.me/${websiteSettings.whatsapp.replace(/\s+/g, '')}`;
+          if (websiteSettings.whatsapp) {
+            el.href = `https://wa.me/${websiteSettings.whatsapp.replace(/\s+/g, '')}`;
+          }
         });
         document.querySelectorAll('a[href^="mailto:"]').forEach(el => {
-          el.href = `mailto:${websiteSettings.email}`;
-          el.innerHTML = el.innerHTML.replace(/duariservice@gmail.com/g, websiteSettings.email);
+          if (websiteSettings.email) {
+            el.href = `mailto:${websiteSettings.email}`;
+            el.innerHTML = el.innerHTML.replace(/duariservice@gmail.com/g, websiteSettings.email);
+          }
         });
         
         // Render Address & Working Hours where applicable
         const hoursEl = document.querySelector('[data-i18n="contactHoursVal"]');
-        if (hoursEl) hoursEl.innerText = websiteSettings.working_hours;
+        if (hoursEl && websiteSettings.working_hours) {
+          hoursEl.innerText = websiteSettings.working_hours;
+        }
         
         const contactAddressText = document.querySelector('a[href*="maps"] span.text-base');
-        if (contactAddressText) contactAddressText.innerText = websiteSettings.address;
+        if (contactAddressText && websiteSettings.address) {
+          contactAddressText.innerText = websiteSettings.address;
+        }
+
+        // Update translations dictionary dynamically to prevent override on language switch
+        if (typeof translations !== "undefined" && translations.de && translations.sq) {
+          if (websiteSettings.services_label && websiteSettings.services_label.trim() !== "") {
+            translations.de.servicesLabel = websiteSettings.services_label;
+            translations.sq.servicesLabel = websiteSettings.services_label;
+          }
+          if (websiteSettings.services_subtitle && websiteSettings.services_subtitle.trim() !== "") {
+            translations.de.servicesHeading = websiteSettings.services_subtitle;
+            translations.sq.servicesHeading = websiteSettings.services_subtitle;
+          }
+          if (websiteSettings.services_tagline && websiteSettings.services_tagline.trim() !== "") {
+            translations.de.sliderTagline = websiteSettings.services_tagline;
+            translations.sq.sliderTagline = websiteSettings.services_tagline;
+          }
+          if (websiteSettings.services_title && websiteSettings.services_title.trim() !== "") {
+            translations.de.sliderHeading = websiteSettings.services_title;
+            translations.sq.sliderHeading = websiteSettings.services_title;
+          }
+        }
+
+        // Apply translations update
+        if (typeof updateLanguage === "function") {
+          updateLanguage(currentLang);
+        } else {
+          // Fallback manual rendering
+          const servicesLabelEl = document.querySelector('[data-i18n="servicesLabel"]');
+          if (servicesLabelEl && websiteSettings.services_label) {
+            servicesLabelEl.innerHTML = websiteSettings.services_label;
+          }
+          const servicesHeadingEl = document.querySelector('[data-i18n="servicesHeading"]');
+          if (servicesHeadingEl && websiteSettings.services_subtitle) {
+            servicesHeadingEl.innerHTML = websiteSettings.services_subtitle;
+          }
+          const sliderTaglineEl = document.querySelector('[data-i18n="sliderTagline"]');
+          if (sliderTaglineEl && websiteSettings.services_tagline) {
+            sliderTaglineEl.innerHTML = websiteSettings.services_tagline;
+          }
+          const sliderHeadingEl = document.querySelector('[data-i18n="sliderHeading"]');
+          if (sliderHeadingEl && websiteSettings.services_title) {
+            sliderHeadingEl.innerHTML = websiteSettings.services_title;
+          }
+        }
       }
 
-      // 2. Fetch & Render Services
-      const services = await ServiceManager.fetchServices();
+      // Icon helper for services
+      const getServiceIconSvg = (title) => {
+        const t = (title || "").toLowerCase();
+        if (t.includes("wärme") || t.includes("warm")) {
+          return `<svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17.657 16.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" /></svg>`;
+        }
+        if (t.includes("kälte") || t.includes("kalt")) {
+          return `<svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07L19.07 4.93M12 6L9 9M12 6l3 3M12 18l-3-3M12 18l3-3M6 12l3-3M6 12l3 3M18 12l-3-3M18 12l-3 3" /></svg>`;
+        }
+        if (t.includes("schall")) {
+          return `<svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>`;
+        }
+        if (t.includes("brand")) {
+          return `<svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>`;
+        }
+        return `<svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>`;
+      };
+      window.getServiceIconSvg = getServiceIconSvg;
 
-        // Helper to pick appropriate SVG icon per service
-        const getServiceIcon = (title) => {
-          const t = (title || "").toLowerCase();
-          if (t.includes("heizung") || t.includes("wärme") || t.includes("unterhalt")) {
-            return {
-              bg: "bg-orange-50 border border-orange-200/60 text-orange-600",
-              svg: `<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" /></svg>`
-            };
-          }
-          if (t.includes("kälte") || t.includes("büro") || t.includes("klima")) {
-            return {
-              bg: "bg-blue-50 border border-blue-200/60 text-blue-600",
-              svg: `<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07L19.07 4.93M12 6L9 9M12 6l3 3M12 18l-3-3M12 18l3-3M6 12l3-3M6 12l3 3M18 12l-3-3M18 12l-3 3" /></svg>`
-            };
-          }
-          if (t.includes("blech") || t.includes("glas") || t.includes("fenster")) {
-            return {
-              bg: "bg-slate-100 border border-slate-200 text-slate-700",
-              svg: `<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>`
-            };
-          }
-          if (t.includes("armatur") || t.includes("bau")) {
-            return {
-              bg: "bg-amber-50 border border-amber-200/60 text-amber-600",
-              svg: `<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /></svg>`
-            };
-          }
-          if (t.includes("brand") || t.includes("sonder")) {
-            return {
-              bg: "bg-red-50 border border-red-200/60 text-red-600",
-              svg: `<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>`
-            };
-          }
-          return {
-            bg: "bg-emerald-50 border border-emerald-200/60 text-emerald-600",
-            svg: `<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>`
+      // 2. Fetch & Render Services on Homepage Grid
+      let services = await ServiceManager.fetchServices();
+      if (!services || services.length === 0) {
+        services = await mockDb.getServices();
+      }
+      window.servicesData = services; // expose globally for modal details
+      const srvGrid = document.getElementById("dynamic-services-grid");
+      if (srvGrid && services && services.length > 0) {
+        srvGrid.innerHTML = "";
+        services.forEach(srv => {
+          const card = document.createElement("article");
+          card.onclick = () => {
+            openServiceDetailModal(srv.id);
           };
-        };
-
-        // Also update the calculator selection
-        const calculatorServicesContainer = document.querySelector('#step-content-1 .grid');
-        if (calculatorServicesContainer) {
-          calculatorServicesContainer.innerHTML = "";
-          services.forEach((srv, index) => {
-            const iconObj = getServiceIcon(srv.title);
-            const srvCard = document.createElement("div");
-            srvCard.setAttribute("onclick", `selectService('${srv.title}')`);
-            srvCard.id = `service-opt-${index + 1}`;
-            srvCard.className = `service-card bg-white border border-slate-200/80 rounded-2xl p-5 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:shadow-lg hover:-translate-y-0.5 transition-all text-center group relative ${index === 0 ? 'active' : ''}`;
-            srvCard.innerHTML = `
-              <div class="w-12 h-12 rounded-2xl ${iconObj.bg} flex items-center justify-center mb-3.5 group-hover:scale-110 transition-transform">
-                ${iconObj.svg}
+          card.className = "glass-card rounded-3xl p-8 md:p-10 min-h-[220px] flex items-start gap-6 cursor-pointer group text-left";
+          
+          const iconSvg = getServiceIconSvg(srv.title);
+          
+          card.innerHTML = `
+            <div class="w-14 h-14 rounded-full glass-icon-box flex items-center justify-center text-blue-600 shrink-0 group-hover:scale-110 transition-transform duration-300">
+              ${iconSvg}
+            </div>
+            <div>
+              <div class="flex items-center justify-between gap-4">
+                <h3 class="text-xl font-extrabold text-slate-900">${srv.title}</h3>
+                <span class="text-xs font-bold bg-blue-50 text-blue-600 border border-blue-200/40 px-2.5 py-1 rounded-full shrink-0">${srv.price ? (isNaN(srv.price) ? srv.price : 'ab €' + srv.price) : 'auf Anfrage'}</span>
               </div>
-              <span class="text-xs font-bold text-slate-800 leading-snug">${srv.title}</span>
-            `;
-            calculatorServicesContainer.appendChild(srvCard);
-          });
+              <p class="mt-3 text-sm text-slate-600 leading-relaxed max-w-lg font-semibold">
+                ${srv.description || (srv.benefits && srv.benefits[0]) || ""}
+              </p>
+              <div class="mt-5 flex items-center gap-6">
+                <button onclick="event.stopPropagation(); selectService('${srv.title}'); document.getElementById('inquiry-form-container').scrollIntoView({ behavior: 'smooth' });" class="inline-flex items-center gap-2 text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors">
+                  <span>Angebot anfordern</span>
+                  <span class="w-5 h-5 rounded-full bg-blue-600 text-white inline-flex items-center justify-center text-xs shadow-md group-hover:translate-x-0.5 transition-transform">›</span>
+                </button>
+                <button onclick="event.stopPropagation(); openServiceDetailModal('${srv.id}');" class="text-xs font-bold text-slate-500 hover:text-blue-600 transition-colors">
+                  Mehr erfahren &rarr;
+                </button>
+              </div>
+            </div>
+          `;
+          srvGrid.appendChild(card);
+        });
+      }
+
+      // Also update the calculator selection
+      const calculatorServicesContainer = document.querySelector('#step-content-1 .grid');
+      if (calculatorServicesContainer && services && services.length > 0) {
+        calculatorServicesContainer.innerHTML = "";
+        services.forEach((srv, index) => {
+          const srvCard = document.createElement("div");
+          srvCard.setAttribute("onclick", `selectService('${srv.title}')`);
+          srvCard.id = `service-opt-${index + 1}`;
+          srvCard.className = `service-card bg-white border border-slate-200/80 rounded-2xl p-5 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:shadow-lg hover:-translate-y-0.5 transition-all text-center group relative ${index === 0 ? 'active' : ''}`;
+          
+          const iconSvg = getServiceIconSvg(srv.title);
+          
+          srvCard.innerHTML = `
+            <div class="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200/60 text-blue-600 flex items-center justify-center mb-3.5 group-hover:scale-110 transition-transform">
+              ${iconSvg}
+            </div>
+            <span class="text-xs font-bold text-slate-800 leading-snug">${srv.title}</span>
+          `;
+          calculatorServicesContainer.appendChild(srvCard);
+        });
+        if (services[0]) {
           window.selectService(services[0].title);
         }
+      }
 
       // 3. Fetch & Render Gallery Projects
       const dbProjects = await ProjectService.fetchProjects();
@@ -972,7 +1180,36 @@ document.addEventListener("DOMContentLoaded", () => {
         window.renderProjectsList();
       }
 
-      // Vorteile removed as requested
+      // 4. Fetch & Map Advantages (Vorteile) into the original Interactive Slider layout
+      const vorteile = await VorteileService.fetchVorteile();
+      if (vorteile && vorteile.length > 0) {
+        const originalIcons = [
+          `<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138z" /></svg>`,
+          `<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>`,
+          `<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`,
+          `<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>`
+        ];
+
+        vorteile.forEach((vt, i) => {
+          if (servicesInteractiveData[i]) {
+            servicesInteractiveData[i].title = vt.title;
+            servicesInteractiveData[i].titleSq = vt.title;
+            servicesInteractiveData[i].text = vt.description;
+            servicesInteractiveData[i].textSq = vt.description;
+            servicesInteractiveData[i].image = vt.photo || servicesInteractiveData[i].image;
+            servicesInteractiveData[i].badgeTitle = vt.title;
+            servicesInteractiveData[i].badgeTitleSq = vt.title;
+            if (originalIcons[i]) {
+              servicesInteractiveData[i].icon = originalIcons[i];
+            }
+          }
+        });
+        
+        // Re-render and select active item
+        window.activeServiceIndex = 0;
+        window.setServiceActive(0);
+        window.renderInteractiveServices();
+      }
     } catch (e) {
       console.error("Dynamic content loading failed:", e);
     }
@@ -1008,6 +1245,18 @@ document.addEventListener("DOMContentLoaded", () => {
           message: `${subject}: ${message}`
         });
 
+        // Trigger confetti celebration!
+        window.triggerCelebration();
+
+        // Send notification email to admin!
+        window.sendNotificationEmail(`Neue Kontakt-Nachricht von ${name}`, `
+          <h3>Neue Kontakt-Nachricht erhalten</h3>
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>E-Mail:</strong> ${email}</p>
+          <p><strong>Telefon:</strong> ${phone}</p>
+          <p><strong>Nachricht:</strong><br>${subject}: ${message}</p>
+        `);
+
         submitBtn.disabled = false;
         if (submitSpinner) submitSpinner.classList.add("hidden");
         if (submitText) submitText.classList.remove("hidden");
@@ -1020,7 +1269,12 @@ document.addEventListener("DOMContentLoaded", () => {
         contactForm.reset();
       } catch (err) {
         console.error("Contact Message submission failed:", err);
-        alert("Failed to submit message.");
+        window.showAlert(
+          document.documentElement.lang === "sq"
+            ? "Dërgimi i mesazhit dështoi. Ju lutem provoni përsëri!"
+            : "Fehler beim Absenden der Nachricht. Bitte versuchen Sie es erneut.",
+          document.documentElement.lang === "sq" ? "Gabim" : "Fehler"
+        );
         submitBtn.disabled = false;
         if (submitSpinner) submitSpinner.classList.add("hidden");
         if (submitText) submitText.classList.remove("hidden");
@@ -1047,7 +1301,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const name = document.getElementById("contact-name").value;
     const email = document.getElementById("contact-email").value;
     const phone = document.getElementById("contact-phone") ? document.getElementById("contact-phone").value : "";
-    const service = document.getElementById("contact-service") ? document.getElementById("contact-service").value : "Büroreinigung";
+    const service = document.getElementById("contact-service") ? document.getElementById("contact-service").value : "Wärmeschutz";
     const message = document.getElementById("contact-message").value;
 
     try {
@@ -1066,15 +1320,36 @@ document.addEventListener("DOMContentLoaded", () => {
         message: message
       });
 
-      alert(document.documentElement.lang === "sq"
-        ? "Kërkesa juaj u dërgua me sukses! Do t'ju kontaktojmë së shpejti."
-        : "Ihre Anfrage wurde erfolgreich gesendet! Wir werden uns in Kürze bei Ihnen melden.");
+      // Trigger confetti celebration!
+      window.triggerCelebration();
+
+      // Send notification email to admin!
+      window.sendNotificationEmail(`Neue Anfrage (Footer) von ${name}`, `
+        <h3>Neue Footer-Anfrage erhalten</h3>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>E-Mail:</strong> ${email}</p>
+        <p><strong>Telefon:</strong> ${phone}</p>
+        <p><strong>Ausgewählter Service:</strong> ${service}</p>
+        <p><strong>Nachricht:</strong><br>${message}</p>
+      `);
+
+      window.showAlert(
+        document.documentElement.lang === "sq"
+          ? "Kërkesa juaj u dërgua me sukses! Do t'ju kontaktojmë së shpejti."
+          : "Ihre Anfrage wurde erfolgreich gesendet! Wir werden uns in Kürze bei Ihnen melden.",
+        document.documentElement.lang === "sq" ? "Sukses" : "Erfolgreich"
+      );
 
       const form = document.getElementById("contact-inquiry-form");
       if (form) form.reset();
     } catch (e) {
       console.error(e);
-      alert("Error submitting request.");
+      window.showAlert(
+        document.documentElement.lang === "sq"
+          ? "Dërgimi i kërkesës dështoi. Ju lutem provoni përsëri!"
+          : "Fehler beim Absenden der Anfrage. Bitte versuchen Sie es erneut.",
+        document.documentElement.lang === "sq" ? "Gabim" : "Fehler"
+      );
     }
   };
 
@@ -1148,11 +1423,42 @@ document.addEventListener("DOMContentLoaded", () => {
     const overlaySubtext = document.getElementById("service-overlay-subtext");
 
     if (sliderImg) {
-      sliderImg.style.opacity = "0.3";
-      setTimeout(() => {
-        sliderImg.src = data.image;
-        sliderImg.style.opacity = "1";
-      }, 150);
+      const sliderContainer = sliderImg.parentElement;
+      let sliderVideo = document.getElementById("service-slider-video");
+      const isVideo = data.image && (
+        data.image.startsWith("data:video") || 
+        data.image.endsWith(".mp4") || 
+        data.image.endsWith(".webm") || 
+        data.image.includes(".mp4?")
+      );
+
+      if (isVideo && sliderContainer) {
+        sliderImg.style.display = "none";
+        if (!sliderVideo) {
+          sliderVideo = document.createElement("video");
+          sliderVideo.id = "service-slider-video";
+          sliderVideo.autoplay = true;
+          sliderVideo.loop = true;
+          sliderVideo.muted = true;
+          sliderVideo.playsInline = true;
+          sliderVideo.className = "w-full h-full object-cover transition-all duration-500";
+          sliderContainer.insertBefore(sliderVideo, sliderContainer.firstChild);
+        }
+        sliderVideo.style.display = "block";
+        if (sliderVideo.src !== data.image) {
+          sliderVideo.src = data.image;
+          sliderVideo.load();
+          sliderVideo.play().catch(e => console.log("Video autoplay:", e));
+        }
+      } else {
+        if (sliderVideo) sliderVideo.style.display = "none";
+        sliderImg.style.display = "block";
+        sliderImg.style.opacity = "0.3";
+        setTimeout(() => {
+          sliderImg.src = data.image;
+          sliderImg.style.opacity = "1";
+        }, 150);
+      }
     }
     if (overlayBadgeTitle) overlayBadgeTitle.innerText = isSq ? data.badgeTitleSq : data.badgeTitle;
     if (overlayBadgeLabel) overlayBadgeLabel.innerText = isSq ? data.badgeLabelSq : data.badgeLabel;
@@ -1255,11 +1561,70 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("wheel", handleScrollOrWheelClose, { passive: true });
   window.addEventListener("touchmove", handleScrollOrWheelClose, { passive: true });
 
+  // --- Typewriter Hero Animation ---
+  const initTypewriter = () => {
+    const textEl = document.getElementById("typewriter-text");
+    if (!textEl) return;
+
+    const wordsDe = [
+      "für jedes Objekt.",
+      "für Industrie & Gewerbe.",
+      "für Privathäuser.",
+      "für Rohrleitungen.",
+      "für Ihr Gebäude."
+    ];
+
+    const wordsSq = [
+      "për çdo objekt.",
+      "për industri & biznese.",
+      "për shtëpi private.",
+      "për gypa & tubacione.",
+      "për ndërtesën tuaj."
+    ];
+
+    let wordIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+    let delay = 150;
+
+    const type = () => {
+      const textElReal = document.getElementById("typewriter-text");
+      if (!textElReal) return;
+      const isSq = document.documentElement.lang === "sq";
+      const currentWords = isSq ? wordsSq : wordsDe;
+      const currentWord = currentWords[wordIndex % currentWords.length];
+
+      if (isDeleting) {
+        textElReal.textContent = currentWord.substring(0, charIndex - 1);
+        charIndex--;
+        delay = 60;
+      } else {
+        textElReal.textContent = currentWord.substring(0, charIndex + 1);
+        charIndex++;
+        delay = 120;
+      }
+
+      if (!isDeleting && charIndex === currentWord.length) {
+        delay = 2000;
+        isDeleting = true;
+      } else if (isDeleting && charIndex === 0) {
+        isDeleting = false;
+        wordIndex++;
+        delay = 500;
+      }
+
+      setTimeout(type, delay);
+    };
+
+    setTimeout(type, 1000);
+  };
+
   // --- INITIALIZATION TRIGGERS ---
   initFormState();
   loadApprovedReviews();
   initializeDynamicContent();
   renderFaq();
+  initTypewriter();
   if (window.setServiceActive) {
     window.setServiceActive(0);
   }
@@ -1273,12 +1638,19 @@ window.openVideoModal = function() {
     if (modal.parentElement !== document.body) {
       document.body.appendChild(modal);
     }
+    modal.classList.add("active");
     modal.style.display = "flex";
-    requestAnimationFrame(() => {
-      modal.classList.add("active");
-    });
+    document.body.style.overflow = "hidden";
   }
   if (video) {
+    const videoUrl = (window.websiteSettings && window.websiteSettings.about_video_url) 
+                      || localStorage.getItem("prekadini_video_url") 
+                      || "work.mp4";
+    const source = video.querySelector("source");
+    if (source && source.src !== videoUrl && !source.src.endsWith(videoUrl)) {
+      source.src = videoUrl;
+      video.load();
+    }
     try {
       video.currentTime = 0;
       const playPromise = video.play();
@@ -1299,11 +1671,8 @@ window.closeVideoModal = function() {
   }
   if (modal) {
     modal.classList.remove("active");
-    setTimeout(() => {
-      if (!modal.classList.contains("active")) {
-        modal.style.display = "none";
-      }
-    }, 350);
+    modal.style.display = "none";
+    document.body.style.overflow = "";
   }
 };
 
@@ -1416,13 +1785,15 @@ const serviceModalData = {
 };
 
 window.openServiceDetailModal = function(key) {
-  const data = serviceModalData[key];
-  if (!data) return;
-
-  const modal = document.getElementById("service-detail-modal");
   const isSq = document.documentElement.lang === "sq";
-
+  const modal = document.getElementById("service-detail-modal");
   if (!modal) return;
+
+  // Try to find dynamic service
+  let dbService = null;
+  if (window.servicesData) {
+    dbService = window.servicesData.find(s => s.id === key || s.title === key);
+  }
 
   const iconContainer = document.getElementById("service-modal-icon-container");
   const badgeEl = document.getElementById("service-modal-badge");
@@ -1431,6 +1802,55 @@ window.openServiceDetailModal = function(key) {
   const captionEl = document.getElementById("service-modal-img-caption");
   const descMainEl = document.getElementById("service-modal-desc-main");
   const descSecondaryEl = document.getElementById("service-modal-desc-secondary");
+  const featuresList = document.getElementById("service-modal-features-list");
+
+  if (dbService) {
+    if (iconContainer) {
+      const iconSvg = window.getServiceIconSvg ? window.getServiceIconSvg(dbService.title) : "";
+      iconContainer.innerHTML = iconSvg;
+    }
+    if (badgeEl) badgeEl.innerText = isSq ? "DETAJET E SHËRBIMIT" : "LEISTUNGS-DETAILS";
+    if (titleEl) titleEl.innerText = dbService.title;
+    if (imgEl) imgEl.src = dbService.photo || "feature_ergebnisse.jpg";
+    if (captionEl) captionEl.innerText = "Prekadini ThermoTech";
+    if (descMainEl) descMainEl.innerText = dbService.description || "";
+    if (descSecondaryEl) {
+      descSecondaryEl.innerText = (dbService.benefits || []).join(" • ");
+    }
+
+    if (featuresList) {
+      featuresList.innerHTML = "";
+      const list = dbService.checklist || [];
+      list.forEach((item) => {
+        const li = document.createElement("li");
+        li.style.cssText = "display: flex; align-items: flex-start; gap: 8px; background: #f8fafc; padding: 10px; border-radius: 12px; border: 1px solid #f1f5f9;";
+        li.innerHTML = `
+          <svg style="width: 16px; height: 16px; color: #2563eb; flex-shrink: 0; margin-top: 2px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+          </svg>
+          <span>${item}</span>
+        `;
+        featuresList.appendChild(li);
+      });
+    }
+
+    const ctaEl = document.getElementById("service-modal-cta");
+    if (ctaEl) {
+      ctaEl.setAttribute("onclick", `selectService('${dbService.title}'); closeServiceDetailModal();`);
+      ctaEl.href = "#inquiry-form-container";
+    }
+
+    if (modal.parentElement !== document.body) {
+      document.body.appendChild(modal);
+    }
+    modal.classList.add("active");
+    modal.style.display = "flex";
+    document.body.style.overflow = "hidden";
+    return;
+  }
+
+  const data = serviceModalData[key];
+  if (!data) return;
 
   if (iconContainer) iconContainer.innerHTML = data.icon;
   if (badgeEl) badgeEl.innerText = isSq ? data.badgeSq : data.badge;
@@ -1439,8 +1859,6 @@ window.openServiceDetailModal = function(key) {
   if (captionEl) captionEl.innerText = isSq ? data.captionSq : data.caption;
   if (descMainEl) descMainEl.innerText = isSq ? data.descMainSq : data.descMain;
   if (descSecondaryEl) descSecondaryEl.innerText = isSq ? data.descSecondarySq : data.descSecondary;
-
-  const featuresList = document.getElementById("service-modal-features-list");
   if (featuresList) {
     featuresList.innerHTML = "";
     const list = isSq ? data.featuresSq : data.features;
@@ -1460,20 +1878,15 @@ window.openServiceDetailModal = function(key) {
   if (modal.parentElement !== document.body) {
     document.body.appendChild(modal);
   }
+  modal.classList.add("active");
   modal.style.display = "flex";
-  requestAnimationFrame(() => {
-    modal.classList.add("active");
-  });
 };
 
 window.closeServiceDetailModal = function() {
   const modal = document.getElementById("service-detail-modal");
   if (modal) {
     modal.classList.remove("active");
-    setTimeout(() => {
-      if (!modal.classList.contains("active")) {
-        modal.style.display = "none";
-      }
-    }, 350);
+    modal.style.display = "none";
   }
+  document.body.style.overflow = "";
 };

@@ -9,6 +9,7 @@ const translations = {
     
     heroTagline: "TOP #1 WÄRME- & KÄLTESCHUTZ",
     heroTitle: "Professionelle Isolierung Für jedes Objekt.",
+    heroTitleBase: "Professionelle Isolierung",
     heroSubtitle: "Zuverlässige Dämmlösungen für Industrie und Privathaushalte mit hochwertiger Blechummantelung, moderner Ausrüstung und maximaler Energieeinsparung.",
     heroCtaDiscover: "Leistungen entdecken",
     heroCtaHow: "Wie wir arbeiten",
@@ -27,7 +28,7 @@ const translations = {
     servicesSubtitle: "Maßgeschneiderte Dämmlösungen für maximale Energieeffizienz, Sicherheit und Langlebigkeit.",
     
     servicesLabel: "WER WIR SIND",
-    servicesHeading: "Engagiert für effiziente <span class='text-blue-600'>professionelle Dämmung</span>.",
+    servicesHeading: "Engagiert für effiziente<br><span class='text-blue-600'>professionelle Dämmung</span>.",
     servicesDesc: "Wir bieten zuverlässige und zertifizierte Isolierungslösungen für Gewerbe, Industrie und Privathaushalte – für makellose Energieeffizienz, gesundes Klima und höchste Heizkosteneinsparung.",
     servicesCta: "Mehr über uns & Angebot anfordern &rarr;",
     servicesActiveBadge: "Aktiv",
@@ -202,6 +203,7 @@ const translations = {
     
     heroTagline: "TOP #1 IZOLIMI TERMIK & I FTOHTIT",
     heroTitle: "Izolim Profesional Për çdo objekt.",
+    heroTitleBase: "Izolim Profesional",
     heroSubtitle: "Zgjidhje të besueshme izolimi për industri dhe shtëpi private me veshje të jashtme llamarine (metalike), pajisje moderne dhe kursim maksimal të energjisë.",
     heroCtaDiscover: "Zbulo shërbimet",
     heroCtaHow: "Si punojmë",
@@ -220,7 +222,7 @@ const translations = {
     servicesSubtitle: "Zgjidhje të personalizuara izolimi për efikasitet maksimal të energjisë, siguri dhe jetëgjatësi.",
     
     servicesLabel: "KUSH JEMI NE",
-    servicesHeading: "Të angazhuar për izolim <span class='text-blue-600'>efikas e profesional</span>.",
+    servicesHeading: "Të angazhuar për izolim<br><span class='text-blue-600'>efikas e profesional</span>.",
     servicesDesc: "Ne ofrojmë zgjidhje izolimi të besueshme dhe të certifikuara për biznese, industri dhe shtëpi private – për efikasitet maksimal të energjisë, klimë të shëndetshme dhe kursim të lartë të ngrohjes.",
     servicesCta: "Më shumë rreth nesh & Kërko një Ofertë &rarr;",
     servicesActiveBadge: "Aktive",
@@ -311,7 +313,7 @@ const translations = {
     step1Title: "Kërkesa",
     step1Desc: "Kërkoni ofertë online ose telefononi në më pak se 60 sekonda.",
     step2Title: "Inspektimi",
-    step2Desc: "<span class='inline-block whitespace-nowrap'>Shikimi, këshillimi</span><br><span class='inline-block whitespace-nowrap'>dhe matja e saktë falas</span><br><span class='inline-block whitespace-nowrap'>direkt në objekt.</span>",
+    step2Desc: "Shikimi, këshillimi<br>dhe matja e saktë falas<br>direkt në objekt.",
     step3Title: "Oferta",
     step3Desc: "Ofertë transparente me çmim fix dhe zgjedhja e materialeve.",
     step4Title: "Realizimi",

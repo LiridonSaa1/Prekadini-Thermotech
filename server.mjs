@@ -25,6 +25,10 @@ createServer(async (request, response) => {
     let relativePath;
     if (requestPath === "/admin" || requestPath === "/admin/") {
       relativePath = "/admin.html";
+    } else if (requestPath === "/admin.html") {
+      response.writeHead(301, { Location: "/admin" });
+      response.end();
+      return;
     } else {
       relativePath = requestPath === "/" ? "/index.html" : normalize(requestPath);
     }

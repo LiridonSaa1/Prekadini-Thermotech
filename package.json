@@ -1,0 +1,11 @@
+{
+  "name": "prekadini-thermotech",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "pngjs": "^7.0.0"
+  }
+}
