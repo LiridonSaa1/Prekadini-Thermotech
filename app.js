@@ -648,25 +648,58 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
+  let reviewsAutoSlideTimer = null;
+
+  const startReviewsAutoSlide = () => {
+    stopReviewsAutoSlide();
+    if (approvedReviews && approvedReviews.length > 1) {
+      reviewsAutoSlideTimer = setInterval(() => {
+        window.nextReview(false);
+      }, 4500);
+    }
+  };
+
+  const stopReviewsAutoSlide = () => {
+    if (reviewsAutoSlideTimer) {
+      clearInterval(reviewsAutoSlideTimer);
+      reviewsAutoSlideTimer = null;
+    }
+  };
+
+  window.startReviewsAutoSlide = startReviewsAutoSlide;
+  window.stopReviewsAutoSlide = stopReviewsAutoSlide;
+
   const loadApprovedReviews = async () => {
     try {
       approvedReviews = await ReviewService.fetchApprovedReviews();
       renderReviewsSlider();
+      startReviewsAutoSlide();
     } catch (err) {
       console.error("Failed to load approved reviews:", err);
     }
   };
 
-  window.prevReview = () => {
-    if (approvedReviews.length === 0) return;
-    activeReviewIndex = (activeReviewIndex - 1 + approvedReviews.length) % approvedReviews.length;
+  window.goToReview = (index) => {
+    if (!approvedReviews || approvedReviews.length === 0) return;
+    activeReviewIndex = index;
     renderReviewsSlider();
+    startReviewsAutoSlide();
   };
 
-  window.nextReview = () => {
-    if (approvedReviews.length === 0) return;
+  window.prevReview = () => {
+    if (!approvedReviews || approvedReviews.length === 0) return;
+    activeReviewIndex = (activeReviewIndex - 1 + approvedReviews.length) % approvedReviews.length;
+    renderReviewsSlider();
+    startReviewsAutoSlide();
+  };
+
+  window.nextReview = (isManual = true) => {
+    if (!approvedReviews || approvedReviews.length === 0) return;
     activeReviewIndex = (activeReviewIndex + 1) % approvedReviews.length;
     renderReviewsSlider();
+    if (isManual) {
+      startReviewsAutoSlide();
+    }
   };
 
   const renderReviewsSlider = () => {
@@ -690,40 +723,78 @@ document.addEventListener("DOMContentLoaded", () => {
     let starsHtml = "";
     for (let i = 1; i <= 5; i++) {
       starsHtml += `
-        <svg class="w-5 h-5 ${i <= (review.rating || 5) ? 'text-amber-400' : 'text-slate-200'}" fill="currentColor" viewBox="0 0 20 20">
+        <svg class="w-5 h-5 ${i <= (review.rating || 5) ? 'text-amber-400 fill-amber-400 drop-shadow-2xs' : 'text-slate-200 fill-slate-200'}" viewBox="0 0 20 20">
           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
         </svg>
       `;
     }
 
-    list.innerHTML = `
-      <div class="bg-blue-50/40 rounded-3xl p-8 md:p-10 max-w-2xl mx-auto border border-slate-100/60 shadow-md relative text-left">
-        <div class="flex items-center justify-between mb-6">
-          <div class="flex items-center space-x-1.5">${starsHtml}</div>
+    // Dots indicators
+    let dotsHtml = "";
+    if (approvedReviews.length > 1) {
+      dotsHtml = `<div class="flex items-center space-x-2">`;
+      approvedReviews.forEach((_, idx) => {
+        const isCurrent = idx === activeReviewIndex;
+        dotsHtml += `
+          <button onclick="goToReview(${idx})" class="transition-all duration-300 rounded-full cursor-pointer ${
+            isCurrent ? 'w-8 h-2.5 bg-blue-600 shadow-sm' : 'w-2.5 h-2.5 bg-slate-200 hover:bg-slate-400'
+          }" aria-label="Review ${idx + 1}"></button>
+        `;
+      });
+      dotsHtml += `</div>`;
+    }
+
+    const cardHtml = `
+      <div id="review-card-item" class="transition-all duration-500 opacity-100 transform translate-x-0 space-y-6 text-left">
+        <div class="flex items-center justify-between gap-4 flex-wrap">
+          <div class="flex items-center space-x-1 bg-amber-50/80 border border-amber-200/60 px-3.5 py-1.5 rounded-full shadow-2xs">
+            ${starsHtml}
+          </div>
+          
           ${approvedReviews.length > 1 ? `
-            <div class="flex items-center space-x-2">
-              <button onclick="prevReview()" class="w-8 h-8 rounded-full bg-white border border-slate-200 text-slate-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all shadow-sm">
+            <div class="flex items-center space-x-3">
+              <button onclick="prevReview()" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-blue-600 hover:text-white border border-slate-200/80 text-slate-700 flex items-center justify-center transition-all duration-200 active:scale-90 shadow-2xs font-bold cursor-pointer" aria-label="Vorherige Bewertung">
                 ‹
               </button>
-              <span class="text-xs font-semibold text-slate-400">${activeReviewIndex + 1} / ${approvedReviews.length}</span>
-              <button onclick="nextReview()" class="w-8 h-8 rounded-full bg-white border border-slate-200 text-slate-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all shadow-sm">
+              <span class="text-xs font-bold text-slate-400 tracking-wider font-mono">${activeReviewIndex + 1} / ${approvedReviews.length}</span>
+              <button onclick="nextReview()" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-blue-600 hover:text-white border border-slate-200/80 text-slate-700 flex items-center justify-center transition-all duration-200 active:scale-90 shadow-2xs font-bold cursor-pointer" aria-label="Nächste Bewertung">
                 ›
               </button>
             </div>
           ` : ''}
         </div>
-        <p class="text-slate-800 text-base md:text-lg italic font-medium leading-relaxed">"${review.text || ''}"</p>
-        <div class="flex items-center space-x-3 mt-8 border-t border-slate-100 pt-6">
-          <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm">
-            ${review.name ? review.name.charAt(0).toUpperCase() : 'K'}
+
+        <blockquote class="text-slate-800 text-lg md:text-xl font-medium leading-relaxed italic relative pt-2">
+          <span class="text-blue-600/20 text-6xl font-serif absolute -top-5 -left-3 select-none pointer-events-none">&ldquo;</span>
+          "${review.text || ''}"
+        </blockquote>
+
+        <div class="flex items-center justify-between border-t border-slate-100 pt-6 flex-wrap gap-4">
+          <div class="flex items-center space-x-4">
+            <div class="w-12 h-12 rounded-2xl bg-blue-600 text-white font-extrabold text-lg flex items-center justify-center shadow-md shadow-blue-500/20 shrink-0">
+              ${review.name ? review.name.charAt(0).toUpperCase() : 'K'}
+            </div>
+            <div>
+              <h4 class="text-base font-extrabold text-slate-900 leading-tight">${review.name || 'Kunde'}</h4>
+              <span class="text-blue-600 text-xs font-bold block mt-0.5">${review.service || 'Dämmung & Isolierung'}</span>
+            </div>
           </div>
-          <div>
-            <h4 class="text-sm font-bold text-slate-900">${review.name || 'Kunde'}</h4>
-            <span class="text-slate-400 text-xs font-semibold block">${review.service || 'Dämmung & Isolierung'}</span>
-          </div>
+          
+          ${dotsHtml}
         </div>
       </div>
     `;
+
+    const currentCard = document.getElementById("review-card-item");
+    if (currentCard) {
+      currentCard.style.opacity = "0";
+      currentCard.style.transform = "translateX(-12px)";
+      setTimeout(() => {
+        list.innerHTML = cardHtml;
+      }, 180);
+    } else {
+      list.innerHTML = cardHtml;
+    }
   };
 
   // --- Dynamic Projects/Gallery Controller ---

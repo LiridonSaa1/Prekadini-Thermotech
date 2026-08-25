@@ -1066,11 +1066,14 @@
       </div>
 
       <!-- Review Slider Card Container -->
-      <div class="mt-16 max-w-4xl mx-auto">
-        <div class="bg-slate-50 border border-slate-100 rounded-3xl p-6 md:p-10 shadow-sm flex flex-col justify-between min-h-[250px] relative text-left">
+      <div class="mt-12 max-w-3xl mx-auto relative group" onmouseenter="window.stopReviewsAutoSlide && window.stopReviewsAutoSlide()" onmouseleave="window.startReviewsAutoSlide && window.startReviewsAutoSlide()">
+        <!-- Subtle Glow Background -->
+        <div class="absolute -inset-1 bg-gradient-to-r from-blue-500/15 via-sky-400/15 to-blue-600/15 rounded-[32px] blur-xl opacity-70 group-hover:opacity-100 transition duration-500"></div>
+
+        <div class="relative bg-white/95 backdrop-blur-xl border border-slate-200/80 rounded-3xl p-6 sm:p-8 md:p-10 shadow-xl hover:shadow-2xl transition-all duration-300">
           
           <!-- Slider Content Wrapper -->
-          <div id="reviews-slider-content" class="space-y-6">
+          <div id="reviews-slider-content">
             <!-- Dynamically populated review content -->
           </div>
 

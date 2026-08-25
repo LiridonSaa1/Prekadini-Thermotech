@@ -351,9 +351,9 @@ const mockDb = {
           id: "seed-1",
           name: "Liridon Salihi",
           email: "liridon@example.com",
-          service: "Büroreinigung",
+          service: "Heizungsrohrdämmung",
           rating: 5.0,
-          text: "Sehr geehrte Damen und Herren, vielen Dank für Ihre Anfrage. Gerne bieten wir Ihnen eine professionelle und gründliche Reinigung Ihrer Räumlichkeiten an.",
+          text: "Hervorragende Ausführung der Rohrdämmung an unseren Heizungsleitungen. Energieverluste wurden sofort spürbar reduziert!",
           approved: true,
           created_at: new Date().toISOString()
         },
@@ -361,9 +361,9 @@ const mockDb = {
           id: "seed-2",
           name: "Michael Weber",
           email: "m.weber@weber-bau.de",
-          service: "Unterhaltsreinigung",
+          service: "Brandschutz-Abschottung",
           rating: 5.0,
-          text: "Die Unterhaltsreinigung an unseren Büroräumen wurde extrem präzise ausgeführt. Absolut saubere Arbeit und pünktliche Lieferung!",
+          text: "Die Brandabschottung nach R90-Standard wurde extrem präzise und normgerecht ausgeführt. Absolut professionelles Team!",
           approved: true,
           created_at: new Date(Date.now() - 86400000).toISOString()
         },
@@ -371,11 +371,21 @@ const mockDb = {
           id: "seed-3",
           name: "Valon Gashi",
           email: "valon@gashi.ch",
-          service: "Glas- & Fensterreinigung",
-          rating: 4.8,
-          text: "Schlierenfreie und extrem saubere Fenster an unserer Glasfassade. Sehr professioneller Service.",
+          service: "Kälteleitungsisolierung",
+          rating: 5.0,
+          text: "Perfekte diffusionsdichte Dämmung unserer Kälteleitungen. Tauwasserbildung wurde komplett verhindert.",
           approved: true,
           created_at: new Date(Date.now() - 172800000).toISOString()
+        },
+        {
+          id: "seed-4",
+          name: "Stefan Huber",
+          email: "stefan@huber-technik.de",
+          service: "Blechummantelung",
+          rating: 5.0,
+          text: "Saubere Alu-Blechummantelung im Industrieobjekt. Hohe Qualität und pünktliche Umsetzung!",
+          approved: true,
+          created_at: new Date(Date.now() - 259200000).toISOString()
         }
       ];
       localStorage.setItem("prekadini_reviews", JSON.stringify(reviews));
